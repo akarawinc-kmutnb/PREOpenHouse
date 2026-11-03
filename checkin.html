@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+    <h2 id="status">กำลังเช็คอิน...</h2>
+    <script>
+        const LIFF_ID = "ใส่_LIFF_ID_สำหรับเช็คอิน";
+        const GAS_URL = "ใส่_WEB_APP_URL_จากข้อ2";
+        
+        // ดึงชื่อฐานจาก URL (เช่น ?station=Math)
+        const urlParams = new URLSearchParams(window.location.search);
+        const stationName = urlParams.get('station');
+
+        liff.init({ liffId: LIFF_ID }).then(() => {
+            if (liff.isLoggedIn()) {
+                liff.getProfile().then(profile => {
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: "checkin", userId: profile.userId, station: stationName })
+                    }).then(() => {
+                        document.getElementById("status").innerText = "เช็คอินฐาน " + stationName + " สำเร็จ!";
+                        setTimeout(() => liff.closeWindow(), 2000);
+                    });
+                });
+            } else {
+                liff.login();
+            }
+        });
+    </script>
+</body>
+</html>
