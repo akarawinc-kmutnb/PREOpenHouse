@@ -4,11 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>ลงทะเบียน Open House</title>
-    <!-- นำเข้าฟอนต์ Kanit จาก Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- นำเข้าไฟล์ CSS -->
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
@@ -19,7 +16,6 @@
     <div class="content">
         <h2>🎪 OPEN HOUSE 2024</h2>
 
-        <!-- ส่วนแสดงการโหลด -->
         <div id="loading">
             <div class="loader"></div>
             <div style="color: #666;">กำลังเตรียมข้อมูล...</div>
@@ -28,14 +24,52 @@
         <!-- ฟอร์มลงทะเบียน -->
         <div id="registerSection">
             <h3>ลงทะเบียนเข้าร่วมงาน</h3>
+            
+            <div class="input-group">
+                <label>คำนำหน้าชื่อ</label>
+                <select id="prefix">
+                    <option value="" disabled selected>เลือกคำนำหน้า</option>
+                    <option value="เด็กชาย">เด็กชาย</option>
+                    <option value="เด็กหญิง">เด็กหญิง</option>
+                    <option value="นาย">นาย</option>
+                    <option value="นาง">นาง</option>
+                    <option value="นางสาว">นางสาว</option>
+                </select>
+            </div>
+            
             <div class="input-group">
                 <label>ชื่อ - นามสกุล</label>
-                <input type="text" id="name" placeholder="นาย/นางสาว...">
+                <input type="text" id="name" placeholder="ไม่ต้องใส่คำนำหน้า">
             </div>
+            
             <div class="input-group">
                 <label>โรงเรียนที่กำลังศึกษา</label>
                 <input type="text" id="school" placeholder="ระบุชื่อโรงเรียน">
             </div>
+            
+            <div class="input-group">
+                <label>ระดับชั้น</label>
+                <select id="level">
+                    <option value="" disabled selected>เลือกระดับชั้น</option>
+                    <option value="ประถม">ประถม</option>
+                    <option value="มัธยมต้น">มัธยมต้น</option>
+                    <option value="มัธยมปลาย">มัธยมปลาย</option>
+                    <option value="ประกาศนียบัตรวิชาชีพ (ปวช.)">ประกาศนียบัตรวิชาชีพ (ปวช.)</option>
+                    <option value="ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)">ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)</option>
+                    <option value="อนุปริญญา">อนุปริญญา</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>เบอร์โทรศัพท์</label>
+                <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
+            </div>
+            
+            <div class="input-group">
+                <label>อีเมล</label>
+                <input type="email" id="email" placeholder="example@email.com">
+            </div>
+            
             <button id="btnRegister" onclick="register()">ยืนยันการลงทะเบียน</button>
         </div>
 
@@ -55,6 +89,18 @@
                     <span class="info-label">โรงเรียน:</span>
                     <span class="info-value" id="profileSchool">-</span>
                 </div>
+                <div class="info-row">
+                    <span class="info-label">ระดับชั้น:</span>
+                    <span class="info-value" id="profileLevel">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">เบอร์โทร:</span>
+                    <span class="info-value" id="profilePhone">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">อีเมล:</span>
+                    <span class="info-value" id="profileEmail" style="font-size: 14px;">-</span>
+                </div>
             </div>
         </div>
         
@@ -63,7 +109,9 @@
 
 <script>
     const LIFF_ID = "2012346461-aXrfKbyZ"; 
+    // อย่าลืมอัปเดต GAS_URL ให้เป็นเวอร์ชันล่าสุดด้วยนะครับ
     const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
+    
     let userId = "";
     let pictureUrl = "";
 
@@ -74,8 +122,6 @@
             liff.getProfile().then(profile => { 
                 userId = profile.userId;
                 pictureUrl = profile.pictureUrl || "https://via.placeholder.com/150";
-                
-                // เอารูปจาก LINE มาใส่รอไว้ในหน้าโปรไฟล์
                 document.getElementById("linePic").src = pictureUrl;
                 
                 checkUserStatus(userId); 
@@ -97,8 +143,12 @@
                 const data = JSON.parse(text); 
                 if (data.status === "found") {
                     document.getElementById("profileSection").style.display = "block";
-                    document.getElementById("profileName").innerText = data.name;
+                    // นำข้อมูลทั้งหมดมาแสดงในโปรไฟล์
+                    document.getElementById("profileName").innerText = data.prefix + data.name;
                     document.getElementById("profileSchool").innerText = data.school;
+                    document.getElementById("profileLevel").innerText = data.level;
+                    document.getElementById("profilePhone").innerText = data.phone;
+                    document.getElementById("profileEmail").innerText = data.email;
                 } else {
                     document.getElementById("registerSection").style.display = "block";
                 }
@@ -115,28 +165,51 @@
     }
 
     function register() {
+        // ดึงข้อมูลจากทุกช่อง
+        const prefix = document.getElementById("prefix").value;
         const name = document.getElementById("name").value.trim();
         const school = document.getElementById("school").value.trim();
+        const level = document.getElementById("level").value;
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
         const btn = document.getElementById("btnRegister");
 
-        if (!name || !school) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        // ตรวจสอบว่ากรอกครบไหม
+        if (!prefix || !name || !school || !level || !phone || !email) {
+            alert("กรุณากรอกข้อมูลให้ครบถ้วนทุกช่อง");
             return;
         }
 
         btn.innerText = "กำลังบันทึก...";
         btn.disabled = true;
 
+        const payload = { 
+            action: "register", 
+            userId: userId, 
+            prefix: prefix,
+            name: name, 
+            school: school,
+            level: level,
+            phone: phone,
+            email: email
+        };
+
         fetch(GAS_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({ action: "register", userId: userId, name: name, school: school })
+            body: JSON.stringify(payload)
         })
         .then(() => {
             document.getElementById("registerSection").style.display = "none";
             document.getElementById("profileSection").style.display = "block";
-            document.getElementById("profileName").innerText = name;
+            
+            // อัปเดตข้อมูลในหน้าโปรไฟล์
+            document.getElementById("profileName").innerText = prefix + name;
             document.getElementById("profileSchool").innerText = school;
+            document.getElementById("profileLevel").innerText = level;
+            document.getElementById("profilePhone").innerText = phone;
+            document.getElementById("profileEmail").innerText = email;
+            
         }).catch((error) => {
             alert("เกิดข้อผิดพลาดตอนบันทึก: " + error.message);
             btn.innerText = "ยืนยันการลงทะเบียน";
