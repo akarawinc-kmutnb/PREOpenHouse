@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -8,215 +9,218 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
+
 <body>
 
-<div class="app-container">
-    <div class="header-bg"></div>
-    
-    <div class="content">
-        <h2>🎪 OPEN HOUSE 2024</h2>
+    <div class="app-container">
+        <div class="header-bg"></div>
 
-        <div id="loading">
-            <div class="loader"></div>
-            <div style="color: #666;">กำลังเตรียมข้อมูล...</div>
-        </div>
+        <div class="content">
+            <h2>🎪 OPEN HOUSE 2024</h2>
 
-        <!-- ฟอร์มลงทะเบียน -->
-        <div id="registerSection">
-            <h3>ลงทะเบียนเข้าร่วมงาน</h3>
-            
-            <div class="input-group">
-                <label>คำนำหน้าชื่อ</label>
-                <select id="prefix">
-                    <option value="" disabled selected>เลือกคำนำหน้า</option>
-                    <option value="เด็กชาย">เด็กชาย</option>
-                    <option value="เด็กหญิง">เด็กหญิง</option>
-                    <option value="นาย">นาย</option>
-                    <option value="นาง">นาง</option>
-                    <option value="นางสาว">นางสาว</option>
-                </select>
+            <div id="loading">
+                <div class="loader"></div>
+                <div style="color: #666;">กำลังเตรียมข้อมูล...</div>
             </div>
-            
-            <div class="input-group">
-                <label>ชื่อ - นามสกุล</label>
-                <input type="text" id="name" placeholder="ไม่ต้องใส่คำนำหน้า">
-            </div>
-            
-            <div class="input-group">
-                <label>โรงเรียนที่กำลังศึกษา</label>
-                <input type="text" id="school" placeholder="ระบุชื่อโรงเรียน">
-            </div>
-            
-            <div class="input-group">
-                <label>ระดับชั้น</label>
-                <select id="level">
-                    <option value="" disabled selected>เลือกระดับชั้น</option>
-                    <option value="ประถม">ประถม</option>
-                    <option value="มัธยมต้น">มัธยมต้น</option>
-                    <option value="มัธยมปลาย">มัธยมปลาย</option>
-                    <option value="ประกาศนียบัตรวิชาชีพ (ปวช.)">ประกาศนียบัตรวิชาชีพ (ปวช.)</option>
-                    <option value="ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)">ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)</option>
-                    <option value="อนุปริญญา">อนุปริญญา</option>
-                </select>
-            </div>
-            
-            <div class="input-group">
-                <label>เบอร์โทรศัพท์</label>
-                <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
-            </div>
-            
-            <div class="input-group">
-                <label>อีเมล</label>
-                <input type="email" id="email" placeholder="example@email.com">
-            </div>
-            
-            <button id="btnRegister" onclick="register()">ยืนยันการลงทะเบียน</button>
-        </div>
 
-        <!-- บัตรประจำตัวผู้เข้าร่วมงาน (Profile) -->
-        <div id="profileSection">
-            <div class="profile-card">
-                <img id="linePic" class="profile-pic" src="https://via.placeholder.com/150" alt="Profile">
-                <div>
-                    <div class="status-badge">✅ ลงทะเบียนแล้ว</div>
+            <!-- ฟอร์มลงทะเบียน -->
+            <div id="registerSection">
+                <h3>ลงทะเบียนเข้าร่วมงาน</h3>
+
+                <div class="input-group">
+                    <label>คำนำหน้าชื่อ</label>
+                    <select id="prefix">
+                        <option value="" disabled selected>เลือกคำนำหน้า</option>
+                        <option value="เด็กชาย">เด็กชาย</option>
+                        <option value="เด็กหญิง">เด็กหญิง</option>
+                        <option value="นาย">นาย</option>
+                        <option value="นาง">นาง</option>
+                        <option value="นางสาว">นางสาว</option>
+                    </select>
                 </div>
-                
-                <div class="info-row">
-                    <span class="info-label">ชื่อ-สกุล:</span>
-                    <span class="info-value" id="profileName">-</span>
+
+                <div class="input-group">
+                    <label>ชื่อ - นามสกุล</label>
+                    <input type="text" id="name" placeholder="ไม่ต้องใส่คำนำหน้า">
                 </div>
-                <div class="info-row">
-                    <span class="info-label">โรงเรียน:</span>
-                    <span class="info-value" id="profileSchool">-</span>
+
+                <div class="input-group">
+                    <label>โรงเรียนที่กำลังศึกษา</label>
+                    <input type="text" id="school" placeholder="ระบุชื่อโรงเรียน">
                 </div>
-                <div class="info-row">
-                    <span class="info-label">ระดับชั้น:</span>
-                    <span class="info-value" id="profileLevel">-</span>
+
+                <div class="input-group">
+                    <label>ระดับชั้น</label>
+                    <select id="level">
+                        <option value="" disabled selected>เลือกระดับชั้น</option>
+                        <option value="ประถม">ประถม</option>
+                        <option value="มัธยมต้น">มัธยมต้น</option>
+                        <option value="มัธยมปลาย">มัธยมปลาย</option>
+                        <option value="ประกาศนียบัตรวิชาชีพ (ปวช.)">ประกาศนียบัตรวิชาชีพ (ปวช.)</option>
+                        <option value="ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)">ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)</option>
+                        <option value="อนุปริญญา">อนุปริญญา</option>
+                    </select>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">เบอร์โทร:</span>
-                    <span class="info-value" id="profilePhone">-</span>
+
+                <div class="input-group">
+                    <label>เบอร์โทรศัพท์</label>
+                    <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
                 </div>
-                <div class="info-row">
-                    <span class="info-label">อีเมล:</span>
-                    <span class="info-value" id="profileEmail" style="font-size: 14px;">-</span>
+
+                <div class="input-group">
+                    <label>อีเมล</label>
+                    <input type="email" id="email" placeholder="example@email.com">
+                </div>
+
+                <button id="btnRegister" onclick="register()">ยืนยันการลงทะเบียน</button>
+            </div>
+
+            <!-- บัตรประจำตัวผู้เข้าร่วมงาน (Profile) -->
+            <div id="profileSection">
+                <div class="profile-card">
+                    <img id="linePic" class="profile-pic" src="https://via.placeholder.com/150" alt="Profile">
+                    <div>
+                        <div class="status-badge">✅ ลงทะเบียนแล้ว</div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">ชื่อ-สกุล:</span>
+                        <span class="info-value" id="profileName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">โรงเรียน:</span>
+                        <span class="info-value" id="profileSchool">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">ระดับชั้น:</span>
+                        <span class="info-value" id="profileLevel">-</span>
+                    </div>
+                    <div class="input-group">
+                        <label>เบอร์โทรศัพท์ <span style="color: #888; font-weight: normal;">(ไม่บังคับ)</span></label>
+                        <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
+                    </div>
+
+                    <div class="input-group">
+                        <label>อีเมล <span style="color: #888; font-weight: normal;">(ไม่บังคับ)</span></label>
+                        <input type="email" id="email" placeholder="example@email.com">
+                    </div>
                 </div>
             </div>
+
         </div>
-        
     </div>
-</div>
 
-<script>
-    const LIFF_ID = "2012346461-aXrfKbyZ"; 
-    // อย่าลืมอัปเดต GAS_URL ให้เป็นเวอร์ชันล่าสุดด้วยนะครับ
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
-    
-    let userId = "";
-    let pictureUrl = "";
+    <script>
+        const LIFF_ID = "2012346461-aXrfKbyZ";
+        // อย่าลืมอัปเดต GAS_URL ให้เป็นเวอร์ชันล่าสุดด้วยนะครับ
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
-    document.getElementById("loading").style.display = "block";
+        let userId = "";
+        let pictureUrl = "";
 
-    liff.init({ liffId: LIFF_ID }).then(() => {
-        if (liff.isLoggedIn()) {
-            liff.getProfile().then(profile => { 
-                userId = profile.userId;
-                pictureUrl = profile.pictureUrl || "https://via.placeholder.com/150";
-                document.getElementById("linePic").src = pictureUrl;
-                
-                checkUserStatus(userId); 
-            });
-        } else {
-            liff.login();
-        }
-    });
+        document.getElementById("loading").style.display = "block";
 
-    function checkUserStatus(uid) {
-        fetch(GAS_URL + "?action=checkUser&userId=" + uid, {
-            method: 'GET',
-            redirect: 'follow'
-        })
-        .then(response => response.text()) 
-        .then(text => {
-            document.getElementById("loading").style.display = "none";
-            try {
-                const data = JSON.parse(text); 
-                if (data.status === "found") {
-                    document.getElementById("profileSection").style.display = "block";
-                    // นำข้อมูลทั้งหมดมาแสดงในโปรไฟล์
-                    document.getElementById("profileName").innerText = data.prefix + data.name;
-                    document.getElementById("profileSchool").innerText = data.school;
-                    document.getElementById("profileLevel").innerText = data.level;
-                    document.getElementById("profilePhone").innerText = data.phone;
-                    document.getElementById("profileEmail").innerText = data.email;
-                } else {
-                    document.getElementById("registerSection").style.display = "block";
-                }
-            } catch(e) {
-                alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-                document.getElementById("registerSection").style.display = "block";
+        liff.init({ liffId: LIFF_ID }).then(() => {
+            if (liff.isLoggedIn()) {
+                liff.getProfile().then(profile => {
+                    userId = profile.userId;
+                    pictureUrl = profile.pictureUrl || "https://via.placeholder.com/150";
+                    document.getElementById("linePic").src = pictureUrl;
+
+                    checkUserStatus(userId);
+                });
+            } else {
+                liff.login();
             }
-        })
-        .catch(error => {
-            alert("เชื่อมต่อฐานข้อมูลล้มเหลว");
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("registerSection").style.display = "block";
         });
-    }
 
-    function register() {
-    // ดึงข้อมูลจากทุกช่อง
-    const prefix = document.getElementById("prefix").value;
-    const name = document.getElementById("name").value.trim();
-    const school = document.getElementById("school").value.trim();
-    const level = document.getElementById("level").value;
-    const phone = document.getElementById("phone").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const btn = document.getElementById("btnRegister");
+        function checkUserStatus(uid) {
+            fetch(GAS_URL + "?action=checkUser&userId=" + uid, {
+                method: 'GET',
+                redirect: 'follow'
+            })
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById("loading").style.display = "none";
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.status === "found") {
+                            document.getElementById("profileSection").style.display = "block";
+                            // นำข้อมูลทั้งหมดมาแสดงในโปรไฟล์
+                            document.getElementById("profileName").innerText = data.prefix + data.name;
+                            document.getElementById("profileSchool").innerText = data.school;
+                            document.getElementById("profileLevel").innerText = data.level;
+                            document.getElementById("profilePhone").innerText = data.phone;
+                            document.getElementById("profileEmail").innerText = data.email;
+                        } else {
+                            document.getElementById("registerSection").style.display = "block";
+                        }
+                    } catch (e) {
+                        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+                        document.getElementById("registerSection").style.display = "block";
+                    }
+                })
+                .catch(error => {
+                    alert("เชื่อมต่อฐานข้อมูลล้มเหลว");
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("registerSection").style.display = "block";
+                });
+        }
 
-    // ตรวจสอบเฉพาะช่องที่บังคับ (คำนำหน้า, ชื่อ, โรงเรียน, ระดับชั้น)
-    if (!prefix || !name || !school || !level) {
-        alert("กรุณากรอกข้อมูลที่จำเป็น (คำนำหน้า, ชื่อ-สกุล, โรงเรียน, ระดับชั้น) ให้ครบถ้วน");
-        return;
-    }
+        function register() {
+            // ดึงข้อมูลจากทุกช่อง
+            const prefix = document.getElementById("prefix").value;
+            const name = document.getElementById("name").value.trim();
+            const school = document.getElementById("school").value.trim();
+            const level = document.getElementById("level").value;
+            const phone = document.getElementById("phone").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const btn = document.getElementById("btnRegister");
 
-    btn.innerText = "กำลังบันทึก...";
-    btn.disabled = true;
+            // ตรวจสอบเฉพาะช่องที่บังคับ (คำนำหน้า, ชื่อ, โรงเรียน, ระดับชั้น)
+            if (!prefix || !name || !school || !level) {
+                alert("กรุณากรอกข้อมูลที่จำเป็น (คำนำหน้า, ชื่อ-สกุล, โรงเรียน, ระดับชั้น) ให้ครบถ้วน");
+                return;
+            }
 
-    const payload = { 
-        action: "register", 
-        userId: userId, 
-        prefix: prefix,
-        name: name, 
-        school: school,
-        level: level,
-        phone: phone || "-", // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
-        email: email || "-"   // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
-    };
+            btn.innerText = "กำลังบันทึก...";
+            btn.disabled = true;
 
-    fetch(GAS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
-    })
-    .then(() => {
-        document.getElementById("registerSection").style.display = "none";
-        document.getElementById("profileSection").style.display = "block";
-        
-        // อัปเดตข้อมูลในหน้าโปรไฟล์
-        document.getElementById("profileName").innerText = prefix + name;
-        document.getElementById("profileSchool").innerText = school;
-        document.getElementById("profileLevel").innerText = level;
-        document.getElementById("profilePhone").innerText = phone || "-";
-        document.getElementById("profileEmail").innerText = email || "-";
-        
-    }).catch((error) => {
-        alert("เกิดข้อผิดพลาดตอนบันทึก: " + error.message);
-        btn.innerText = "ยืนยันการลงทะเบียน";
-        btn.disabled = false;
-    });
-}
-</script>
+            const payload = {
+                action: "register",
+                userId: userId,
+                prefix: prefix,
+                name: name,
+                school: school,
+                level: level,
+                phone: phone || "-", // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
+                email: email || "-"   // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
+            };
+
+            fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            })
+                .then(() => {
+                    document.getElementById("registerSection").style.display = "none";
+                    document.getElementById("profileSection").style.display = "block";
+
+                    // อัปเดตข้อมูลในหน้าโปรไฟล์
+                    document.getElementById("profileName").innerText = prefix + name;
+                    document.getElementById("profileSchool").innerText = school;
+                    document.getElementById("profileLevel").innerText = level;
+                    document.getElementById("profilePhone").innerText = phone || "-";
+                    document.getElementById("profileEmail").innerText = email || "-";
+
+                }).catch((error) => {
+                    alert("เกิดข้อผิดพลาดตอนบันทึก: " + error.message);
+                    btn.innerText = "ยืนยันการลงทะเบียน";
+                    btn.disabled = false;
+                });
+        }
+    </script>
 
 </body>
+
 </html>
