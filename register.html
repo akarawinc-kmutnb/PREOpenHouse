@@ -4,26 +4,79 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        /* ซ่อนทุกส่วนไว้ก่อน */
+        #loading, #registerSection, #profileSection { display: none; }
+        .profile-card { background: #f0f0f0; padding: 15px; border-radius: 8px; margin-top: 20px; }
+    </style>
 </head>
 <body>
-    <h2>ลงทะเบียน Open House</h2>
-    <input type="text" id="name" placeholder="ชื่อ-สกุล"><br><br>
-    <input type="text" id="school" placeholder="โรงเรียน"><br><br>
-    <button id="btnRegister" onclick="register()">ลงทะเบียน</button>
+    <h2>Open House</h2>
+
+    <!-- 1. ส่วนแสดงการโหลด -->
+    <div id="loading">กำลังตรวจสอบข้อมูล...</div>
+
+    <!-- 2. ส่วนฟอร์มลงทะเบียน (แสดงเมื่อยังไม่เคยลงทะเบียน) -->
+    <div id="registerSection">
+        <h3>กรุณาลงทะเบียนเข้างาน</h3>
+        <input type="text" id="name" placeholder="ชื่อ-สกุล"><br><br>
+        <input type="text" id="school" placeholder="โรงเรียน"><br><br>
+        <button id="btnRegister" onclick="register()">ลงทะเบียน</button>
+    </div>
+
+    <!-- 3. ส่วนแสดงโปรไฟล์ (แสดงเมื่อเคยลงทะเบียนแล้ว) -->
+    <div id="profileSection">
+        <div class="profile-card">
+            <h3>✅ คุณลงทะเบียนเรียบร้อยแล้ว</h3>
+            <p><strong>ชื่อ:</strong> <span id="profileName"></span></p>
+            <p><strong>โรงเรียน:</strong> <span id="profileSchool"></span></p>
+        </div>
+    </div>
 
     <script>
-        // แก้ไข LIFF_ID ให้เป็นรหัสจาก LINE Developers ห้ามใส่เป็น URL
         const LIFF_ID = "2012346461-aXrfKbyZ"; 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwnyByZ17L_OssplbmKuzKo1nbWvTfaqEs_sKBvp5FlVvpLuD3gNWDwqPh6rZMSxMVSiA/exec";
         let userId = "";
 
+        // แสดงข้อความโหลดตอนเปิดแอป
+        document.getElementById("loading").style.display = "block";
+
         liff.init({ liffId: LIFF_ID }).then(() => {
             if (liff.isLoggedIn()) {
-                liff.getProfile().then(profile => { userId = profile.userId; });
+                liff.getProfile().then(profile => { 
+                    userId = profile.userId; 
+                    checkUserStatus(userId); // ส่ง ID ไปเช็คกับ Database
+                });
             } else {
                 liff.login();
             }
         });
+
+        function checkUserStatus(uid) {
+            fetch(GAS_URL, {
+                method: 'POST',
+                // เอา mode: 'no-cors' ออกเพื่อให้รับค่ากลับมาจาก Google ได้
+                body: JSON.stringify({ action: "checkUser", userId: uid })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("loading").style.display = "none";
+                if (data.status === "found") {
+                    // หากเจอข้อมูล ให้แสดงหน้าโปรไฟล์
+                    document.getElementById("profileSection").style.display = "block";
+                    document.getElementById("profileName").innerText = data.name;
+                    document.getElementById("profileSchool").innerText = data.school;
+                } else {
+                    // หากไม่เจอข้อมูล ให้แสดงฟอร์มลงทะเบียน
+                    document.getElementById("registerSection").style.display = "block";
+                }
+            })
+            .catch(error => {
+                alert("เกิดข้อผิดพลาดในการตรวจสอบข้อมูล: " + error);
+                document.getElementById("loading").style.display = "none";
+            });
+        }
 
         function register() {
             const name = document.getElementById("name").value;
@@ -34,21 +87,24 @@
                 alert("กรุณากรอกข้อมูลให้ครบถ้วน");
                 return;
             }
-            if (!userId) {
-                alert("ไม่พบข้อมูล LINE ID กรุณาเปิดผ่านแอป LINE บนมือถือ");
-                return;
-            }
 
             btn.innerText = "กำลังบันทึก...";
             btn.disabled = true;
 
             fetch(GAS_URL, {
                 method: 'POST',
-                mode: 'no-cors', // จำเป็นต้องมี เพื่อให้ส่งข้อมูลไป Google Script ได้
                 body: JSON.stringify({ action: "register", userId: userId, name: name, school: school })
-            }).then(() => {
-                alert("ลงทะเบียนสำเร็จ!");
-                liff.closeWindow();
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    alert("ลงทะเบียนสำเร็จ!");
+                    // ซ่อนฟอร์ม และสลับไปแสดงหน้าโปรไฟล์ทันที
+                    document.getElementById("registerSection").style.display = "none";
+                    document.getElementById("profileSection").style.display = "block";
+                    document.getElementById("profileName").innerText = name;
+                    document.getElementById("profileSchool").innerText = school;
+                }
             }).catch((error) => {
                 alert("เกิดข้อผิดพลาด: " + error);
                 btn.innerText = "ลงทะเบียน";
