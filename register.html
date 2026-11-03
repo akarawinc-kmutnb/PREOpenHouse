@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
     <h2>ลงทะเบียน Open House</h2>
     <input type="text" id="name" placeholder="ชื่อ-สกุล"><br><br>
     <input type="text" id="school" placeholder="โรงเรียน"><br><br>
-    <button onclick="register()">ลงทะเบียน</button>
+    <button id="btnRegister" onclick="register()">ลงทะเบียน</button>
 
     <script>
-        const LIFF_ID = "https://akarawinc-kmutnb.github.io/PREOpenHouse/register";
+        // แก้ไข LIFF_ID ให้เป็นรหัสจาก LINE Developers ห้ามใส่เป็น URL
+        const LIFF_ID = "ใส่_LIFF_ID_ของคุณที่นี่_เช่น_123456789-abcdefg"; 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwnyByZ17L_OssplbmKuzKo1nbWvTfaqEs_sKBvp5FlVvpLuD3gNWDwqPh6rZMSxMVSiA/exec";
         let userId = "";
 
@@ -25,12 +28,31 @@
         function register() {
             const name = document.getElementById("name").value;
             const school = document.getElementById("school").value;
+            const btn = document.getElementById("btnRegister");
+
+            if (!name || !school) {
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+                return;
+            }
+            if (!userId) {
+                alert("ไม่พบข้อมูล LINE ID กรุณาเปิดผ่านแอป LINE บนมือถือ");
+                return;
+            }
+
+            btn.innerText = "กำลังบันทึก...";
+            btn.disabled = true;
+
             fetch(GAS_URL, {
                 method: 'POST',
+                mode: 'no-cors', // จำเป็นต้องมี เพื่อให้ส่งข้อมูลไป Google Script ได้
                 body: JSON.stringify({ action: "register", userId: userId, name: name, school: school })
             }).then(() => {
                 alert("ลงทะเบียนสำเร็จ!");
                 liff.closeWindow();
+            }).catch((error) => {
+                alert("เกิดข้อผิดพลาด: " + error);
+                btn.innerText = "ลงทะเบียน";
+                btn.disabled = false;
             });
         }
     </script>
