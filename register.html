@@ -15,10 +15,8 @@
 <body>
     <h2>Open House</h2>
 
-    <!-- หน้าโหลดตอนเปิดแอป (ระบบกำลังแอบเช็คข้อมูลให้) -->
     <div id="loading">กำลังตรวจสอบข้อมูล... ⏳</div>
 
-    <!-- ฟอร์มลงทะเบียน (แสดงเฉพาะคนใหม่ที่ยังไม่เคยลงเท่านั้น) -->
     <div id="registerSection">
         <h3>กรุณาลงทะเบียนเข้างาน</h3>
         <input type="text" id="name" placeholder="ชื่อ-สกุล"><br>
@@ -26,7 +24,6 @@
         <button id="btnRegister" onclick="register()">ลงทะเบียน</button>
     </div>
 
-    <!-- หน้าโปรไฟล์ (เปิดมาเจอหน้านี้ทันทีถ้าเคยลงทะเบียนแล้ว) -->
     <div id="profileSection">
         <div class="profile-card">
             <h3 style="color: #2e7d32;">✅ คุณลงทะเบียนเรียบร้อยแล้ว</h3>
@@ -53,17 +50,16 @@
             }
         });
 
-        // อัปเดตฟังก์ชันเช็คสถานะให้แสดง Error ที่แท้จริง
         function checkUserStatus(uid) {
             fetch(GAS_URL + "?action=checkUser&userId=" + uid, {
                 method: 'GET',
                 redirect: 'follow'
             })
-            .then(response => response.text()) // อ่านค่ากลับมาเป็นข้อความก่อน
+            .then(response => response.text()) 
             .then(text => {
                 document.getElementById("loading").style.display = "none";
                 try {
-                    const data = JSON.parse(text); // ลองแปลงเป็น JSON
+                    const data = JSON.parse(text); 
                     if (data.status === "found") {
                         document.getElementById("profileSection").style.display = "block";
                         document.getElementById("profileName").innerText = data.name;
@@ -72,14 +68,14 @@
                         document.getElementById("registerSection").style.display = "block";
                     }
                 } catch(e) {
-                    // หาก Google ส่ง Error กลับมาเป็นหน้าเว็บ (ไม่ใช่ JSON) จะแจ้งเตือนตรงนี้
-                    alert("Google Apps Script แจ้งเตือน: \n" + text.substring(0, 100));
+                    alert("ตั้งค่า GAS ผิดพลาด (ไม่ใช่ JSON): \n" + text.substring(0, 80));
                     document.getElementById("registerSection").style.display = "block";
                 }
             })
             .catch(error => {
-                alert("การเชื่อมต่อล้มเหลว: " + error.message);
+                alert("ข้อผิดพลาด v3: " + error.message);
                 document.getElementById("loading").style.display = "none";
+                document.getElementById("registerSection").style.display = "block";
             });
         }
 
@@ -108,7 +104,7 @@
                 document.getElementById("profileName").innerText = name;
                 document.getElementById("profileSchool").innerText = school;
             }).catch((error) => {
-                alert("เกิดข้อผิดพลาดในการบันทึก: " + error.message);
+                alert("เกิดข้อผิดพลาดตอนบันทึก: " + error.message);
                 btn.innerText = "ลงทะเบียน";
                 btn.disabled = false;
             });
