@@ -37,46 +37,52 @@
 
     <script>
         const LIFF_ID = "2012346461-aXrfKbyZ"; 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwnyByZ17L_OssplbmKuzKo1nbWvTfaqEs_sKBvp5FlVvpLuD3gNWDwqPh6rZMSxMVSiA/exec";
         let userId = "";
 
-        // 1. เปิดเว็บปุ๊บ แสดงหน้าโหลดทันที
         document.getElementById("loading").style.display = "block";
 
         liff.init({ liffId: LIFF_ID }).then(() => {
             if (liff.isLoggedIn()) {
                 liff.getProfile().then(profile => { 
                     userId = profile.userId; 
-                    checkUserStatus(userId); // 2. สั่งเช็คฐานข้อมูลทันที
+                    checkUserStatus(userId); 
                 });
             } else {
                 liff.login();
             }
         });
 
-        // ฟังก์ชันเช็คฐานข้อมูล
+        // อัปเดตฟังก์ชันเช็คสถานะให้แสดง Error ที่แท้จริง
         function checkUserStatus(uid) {
-            fetch(GAS_URL + "?action=checkUser&userId=" + uid) // ใช้ GET ไม่ติดบล็อก
-            .then(response => response.json())
-            .then(data => {
+            fetch(GAS_URL + "?action=checkUser&userId=" + uid, {
+                method: 'GET',
+                redirect: 'follow'
+            })
+            .then(response => response.text()) // อ่านค่ากลับมาเป็นข้อความก่อน
+            .then(text => {
                 document.getElementById("loading").style.display = "none";
-                if (data.status === "found") {
-                    // เคยลงแล้ว -> โชว์โปรไฟล์เลย
-                    document.getElementById("profileSection").style.display = "block";
-                    document.getElementById("profileName").innerText = data.name;
-                    document.getElementById("profileSchool").innerText = data.school;
-                } else {
-                    // ไม่เคยลง -> โชว์ฟอร์ม
+                try {
+                    const data = JSON.parse(text); // ลองแปลงเป็น JSON
+                    if (data.status === "found") {
+                        document.getElementById("profileSection").style.display = "block";
+                        document.getElementById("profileName").innerText = data.name;
+                        document.getElementById("profileSchool").innerText = data.school;
+                    } else {
+                        document.getElementById("registerSection").style.display = "block";
+                    }
+                } catch(e) {
+                    // หาก Google ส่ง Error กลับมาเป็นหน้าเว็บ (ไม่ใช่ JSON) จะแจ้งเตือนตรงนี้
+                    alert("Google Apps Script แจ้งเตือน: \n" + text.substring(0, 100));
                     document.getElementById("registerSection").style.display = "block";
                 }
             })
             .catch(error => {
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+                alert("การเชื่อมต่อล้มเหลว: " + error.message);
                 document.getElementById("loading").style.display = "none";
             });
         }
 
-        // ฟังก์ชันกดลงทะเบียน
         function register() {
             const name = document.getElementById("name").value;
             const school = document.getElementById("school").value;
@@ -90,7 +96,6 @@
             btn.innerText = "กำลังบันทึก...";
             btn.disabled = true;
 
-            // ตอนบันทึกข้อมูลต้องใช้ no-cors
             fetch(GAS_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -98,13 +103,12 @@
             })
             .then(() => {
                 alert("ลงทะเบียนสำเร็จ!");
-                // สลับไปหน้าโปรไฟล์ทันทีโดยไม่ต้องโหลดเว็บใหม่
                 document.getElementById("registerSection").style.display = "none";
                 document.getElementById("profileSection").style.display = "block";
                 document.getElementById("profileName").innerText = name;
                 document.getElementById("profileSchool").innerText = school;
             }).catch((error) => {
-                alert("เกิดข้อผิดพลาด");
+                alert("เกิดข้อผิดพลาดในการบันทึก: " + error.message);
                 btn.innerText = "ลงทะเบียน";
                 btn.disabled = false;
             });
