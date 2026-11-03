@@ -5,30 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        /* ซ่อนทุกส่วนไว้ก่อน */
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
         #loading, #registerSection, #profileSection { display: none; }
-        .profile-card { background: #f0f0f0; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .profile-card { background: #e8f5e9; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        input { padding: 10px; width: 80%; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; background: #00B900; color: white; border: none; border-radius: 5px; font-size: 16px; }
     </style>
 </head>
 <body>
     <h2>Open House</h2>
 
-    <!-- 1. ส่วนแสดงการโหลด -->
-    <div id="loading">กำลังตรวจสอบข้อมูล...</div>
+    <!-- หน้าโหลดตอนเปิดแอป (ระบบกำลังแอบเช็คข้อมูลให้) -->
+    <div id="loading">กำลังตรวจสอบข้อมูล... ⏳</div>
 
-    <!-- 2. ส่วนฟอร์มลงทะเบียน (แสดงเมื่อยังไม่เคยลงทะเบียน) -->
+    <!-- ฟอร์มลงทะเบียน (แสดงเฉพาะคนใหม่ที่ยังไม่เคยลงเท่านั้น) -->
     <div id="registerSection">
         <h3>กรุณาลงทะเบียนเข้างาน</h3>
-        <input type="text" id="name" placeholder="ชื่อ-สกุล"><br><br>
+        <input type="text" id="name" placeholder="ชื่อ-สกุล"><br>
         <input type="text" id="school" placeholder="โรงเรียน"><br><br>
         <button id="btnRegister" onclick="register()">ลงทะเบียน</button>
     </div>
 
-    <!-- 3. ส่วนแสดงโปรไฟล์ (แสดงเมื่อเคยลงทะเบียนแล้ว) -->
+    <!-- หน้าโปรไฟล์ (เปิดมาเจอหน้านี้ทันทีถ้าเคยลงทะเบียนแล้ว) -->
     <div id="profileSection">
         <div class="profile-card">
-            <h3>✅ คุณลงทะเบียนเรียบร้อยแล้ว</h3>
+            <h3 style="color: #2e7d32;">✅ คุณลงทะเบียนเรียบร้อยแล้ว</h3>
             <p><strong>ชื่อ:</strong> <span id="profileName"></span></p>
             <p><strong>โรงเรียน:</strong> <span id="profileSchool"></span></p>
         </div>
@@ -39,45 +40,43 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwnyByZ17L_OssplbmKuzKo1nbWvTfaqEs_sKBvp5FlVvpLuD3gNWDwqPh6rZMSxMVSiA/exec";
         let userId = "";
 
-        // แสดงข้อความโหลดตอนเปิดแอป
+        // 1. เปิดเว็บปุ๊บ แสดงหน้าโหลดทันที
         document.getElementById("loading").style.display = "block";
 
         liff.init({ liffId: LIFF_ID }).then(() => {
             if (liff.isLoggedIn()) {
                 liff.getProfile().then(profile => { 
                     userId = profile.userId; 
-                    checkUserStatus(userId); // ส่ง ID ไปเช็คกับ Database
+                    checkUserStatus(userId); // 2. สั่งเช็คฐานข้อมูลทันที
                 });
             } else {
                 liff.login();
             }
         });
 
+        // ฟังก์ชันเช็คฐานข้อมูล
         function checkUserStatus(uid) {
-            fetch(GAS_URL, {
-                method: 'POST',
-                // เอา mode: 'no-cors' ออกเพื่อให้รับค่ากลับมาจาก Google ได้
-                body: JSON.stringify({ action: "checkUser", userId: uid })
-            })
+            fetch(GAS_URL + "?action=checkUser&userId=" + uid) // ใช้ GET ไม่ติดบล็อก
             .then(response => response.json())
             .then(data => {
                 document.getElementById("loading").style.display = "none";
                 if (data.status === "found") {
-                    // หากเจอข้อมูล ให้แสดงหน้าโปรไฟล์
+                    // เคยลงแล้ว -> โชว์โปรไฟล์เลย
                     document.getElementById("profileSection").style.display = "block";
                     document.getElementById("profileName").innerText = data.name;
                     document.getElementById("profileSchool").innerText = data.school;
                 } else {
-                    // หากไม่เจอข้อมูล ให้แสดงฟอร์มลงทะเบียน
+                    // ไม่เคยลง -> โชว์ฟอร์ม
                     document.getElementById("registerSection").style.display = "block";
                 }
             })
             .catch(error => {
-                alert("เกิดข้อผิดพลาดในการตรวจสอบข้อมูล: " + error);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
                 document.getElementById("loading").style.display = "none";
             });
         }
 
+        // ฟังก์ชันกดลงทะเบียน
         function register() {
             const name = document.getElementById("name").value;
             const school = document.getElementById("school").value;
@@ -91,22 +90,21 @@
             btn.innerText = "กำลังบันทึก...";
             btn.disabled = true;
 
+            // ตอนบันทึกข้อมูลต้องใช้ no-cors
             fetch(GAS_URL, {
                 method: 'POST',
+                mode: 'no-cors',
                 body: JSON.stringify({ action: "register", userId: userId, name: name, school: school })
             })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === "success") {
-                    alert("ลงทะเบียนสำเร็จ!");
-                    // ซ่อนฟอร์ม และสลับไปแสดงหน้าโปรไฟล์ทันที
-                    document.getElementById("registerSection").style.display = "none";
-                    document.getElementById("profileSection").style.display = "block";
-                    document.getElementById("profileName").innerText = name;
-                    document.getElementById("profileSchool").innerText = school;
-                }
+            .then(() => {
+                alert("ลงทะเบียนสำเร็จ!");
+                // สลับไปหน้าโปรไฟล์ทันทีโดยไม่ต้องโหลดเว็บใหม่
+                document.getElementById("registerSection").style.display = "none";
+                document.getElementById("profileSection").style.display = "block";
+                document.getElementById("profileName").innerText = name;
+                document.getElementById("profileSchool").innerText = school;
             }).catch((error) => {
-                alert("เกิดข้อผิดพลาด: " + error);
+                alert("เกิดข้อผิดพลาด");
                 btn.innerText = "ลงทะเบียน";
                 btn.disabled = false;
             });
