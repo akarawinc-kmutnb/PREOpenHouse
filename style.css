@@ -145,16 +145,71 @@ button:disabled {
 }
 
 /* Loading */
-.loader {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #ff7a18;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
+#loading {
+    display: none;
+    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(255, 122, 24, 0.15);
+    backdrop-filter: blur(5px);
+    margin: 20px auto;
+}
+
+/* วงกลมหมุนซ้อนกันลุคมินิมอล */
+.loader-box {
+    position: relative;
+    width: 60px;
+    height: 60px;
     margin: 0 auto 15px auto;
 }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+.loader-circle {
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 4px solid transparent;
+    border-top-color: #ff7a18;
+    border-radius: 50%;
+    animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.loader-circle:nth-child(2) {
+    border-top-color: #af002d;
+    animation-delay: -0.4s;
+}
+
+/* ไอคอนหัวใจดุ๊กดิ๊กตรงกลาง */
+.loader-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    animation: heartBeat 1s infinite alternate;
+}
+
+.loading-text {
+    color: #ff7a18;
+    font-size: 16px;
+    font-weight: 500;
+    animation: blinkText 1.5s infinite;
+}
+
+/* Animation ทั้งหมด */
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes heartBeat {
+    0% { transform: translate(-50%, -50%) scale(0.85); }
+    100% { transform: translate(-50%, -50%) scale(1.15); }
+}
+
+@keyframes blinkText {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
 /* ซ่อนหน้าต่าง ๆ ไว้ก่อน */
 #loading, #registerSection, #profileSection { display: none; }
