@@ -165,57 +165,57 @@
     }
 
     function register() {
-        // ดึงข้อมูลจากทุกช่อง
-        const prefix = document.getElementById("prefix").value;
-        const name = document.getElementById("name").value.trim();
-        const school = document.getElementById("school").value.trim();
-        const level = document.getElementById("level").value;
-        const phone = document.getElementById("phone").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const btn = document.getElementById("btnRegister");
+    // ดึงข้อมูลจากทุกช่อง
+    const prefix = document.getElementById("prefix").value;
+    const name = document.getElementById("name").value.trim();
+    const school = document.getElementById("school").value.trim();
+    const level = document.getElementById("level").value;
+    const phone = document.getElementById("phone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const btn = document.getElementById("btnRegister");
 
-        // ตรวจสอบว่ากรอกครบไหม
-        if (!prefix || !name || !school || !level || !phone || !email) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วนทุกช่อง");
-            return;
-        }
-
-        btn.innerText = "กำลังบันทึก...";
-        btn.disabled = true;
-
-        const payload = { 
-            action: "register", 
-            userId: userId, 
-            prefix: prefix,
-            name: name, 
-            school: school,
-            level: level,
-            phone: phone,
-            email: email
-        };
-
-        fetch(GAS_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(payload)
-        })
-        .then(() => {
-            document.getElementById("registerSection").style.display = "none";
-            document.getElementById("profileSection").style.display = "block";
-            
-            // อัปเดตข้อมูลในหน้าโปรไฟล์
-            document.getElementById("profileName").innerText = prefix + name;
-            document.getElementById("profileSchool").innerText = school;
-            document.getElementById("profileLevel").innerText = level;
-            document.getElementById("profilePhone").innerText = phone;
-            document.getElementById("profileEmail").innerText = email;
-            
-        }).catch((error) => {
-            alert("เกิดข้อผิดพลาดตอนบันทึก: " + error.message);
-            btn.innerText = "ยืนยันการลงทะเบียน";
-            btn.disabled = false;
-        });
+    // ตรวจสอบเฉพาะช่องที่บังคับ (คำนำหน้า, ชื่อ, โรงเรียน, ระดับชั้น)
+    if (!prefix || !name || !school || !level) {
+        alert("กรุณากรอกข้อมูลที่จำเป็น (คำนำหน้า, ชื่อ-สกุล, โรงเรียน, ระดับชั้น) ให้ครบถ้วน");
+        return;
     }
+
+    btn.innerText = "กำลังบันทึก...";
+    btn.disabled = true;
+
+    const payload = { 
+        action: "register", 
+        userId: userId, 
+        prefix: prefix,
+        name: name, 
+        school: school,
+        level: level,
+        phone: phone || "-", // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
+        email: email || "-"   // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
+    };
+
+    fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        document.getElementById("registerSection").style.display = "none";
+        document.getElementById("profileSection").style.display = "block";
+        
+        // อัปเดตข้อมูลในหน้าโปรไฟล์
+        document.getElementById("profileName").innerText = prefix + name;
+        document.getElementById("profileSchool").innerText = school;
+        document.getElementById("profileLevel").innerText = level;
+        document.getElementById("profilePhone").innerText = phone || "-";
+        document.getElementById("profileEmail").innerText = email || "-";
+        
+    }).catch((error) => {
+        alert("เกิดข้อผิดพลาดตอนบันทึก: " + error.message);
+        btn.innerText = "ยืนยันการลงทะเบียน";
+        btn.disabled = false;
+    });
+}
 </script>
 
 </body>
