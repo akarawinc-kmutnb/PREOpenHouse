@@ -63,12 +63,12 @@
                 </div>
 
                 <div class="input-group">
-                    <label>เบอร์โทรศัพท์</label>
-                    <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
+                    <label>เบอร์โทรศัพท์ <span style="color: #888; font-weight: normal;">(ไม่บังคับ)</span></label>
+                    <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10" inputmode="numeric">
                 </div>
 
                 <div class="input-group">
-                    <label>อีเมล</label>
+                    <label>อีเมล <span style="color: #888; font-weight: normal;">(ไม่บังคับ)</span></label>
                     <input type="email" id="email" placeholder="example@email.com">
                 </div>
 
@@ -95,14 +95,13 @@
                         <span class="info-label">ระดับชั้น:</span>
                         <span class="info-value" id="profileLevel">-</span>
                     </div>
-                    <div class="input-group">
-                        <label>เบอร์โทรศัพท์ <span style="color: #888; font-weight: normal;">(ไม่บังคับ)</span></label>
-                        <input type="tel" id="phone" placeholder="08XXXXXXXX" maxlength="10">
+                    <div class="info-row">
+                        <span class="info-label">เบอร์โทรศัพท์:</span>
+                        <span class="info-value" id="profilePhone">-</span>
                     </div>
-
-                    <div class="input-group">
-                        <label>อีเมล <span style="color: #888; font-weight: normal;">(ไม่บังคับ)</span></label>
-                        <input type="email" id="email" placeholder="example@email.com">
+                    <div class="info-row">
+                        <span class="info-label">อีเมล:</span>
+                        <span class="info-value" id="profileEmail">-</span>
                     </div>
                 </div>
             </div>
@@ -118,6 +117,22 @@
         let userId = "";
         let pictureUrl = "";
 
+        // ตั้งค่าข้อความในโปรไฟล์ (ถ้าค่าว่างให้แสดง "-")
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.innerText = value || "-";
+        }
+
+        function showProfile(d) {
+            document.getElementById("registerSection").style.display = "none";
+            document.getElementById("profileSection").style.display = "block";
+            setText("profileName", (d.prefix || "") + (d.name || ""));
+            setText("profileSchool", d.school);
+            setText("profileLevel", d.level);
+            setText("profilePhone", d.phone);
+            setText("profileEmail", d.email);
+        }
+
         document.getElementById("loading").style.display = "block";
 
         liff.init({ liffId: LIFF_ID }).then(() => {
@@ -132,10 +147,13 @@
             } else {
                 liff.login();
             }
+        }).catch(err => {
+            document.getElementById("loading").style.display = "none";
+            alert("เริ่มต้น LIFF ไม่สำเร็จ: " + err.message);
         });
 
         function checkUserStatus(uid) {
-            fetch(GAS_URL + "?action=checkUser&userId=" + uid, {
+            fetch(GAS_URL + "?action=checkUser&userId=" + encodeURIComponent(uid), {
                 method: 'GET',
                 redirect: 'follow'
             })
@@ -145,17 +163,12 @@
                     try {
                         const data = JSON.parse(text);
                         if (data.status === "found") {
-                            document.getElementById("profileSection").style.display = "block";
-                            // นำข้อมูลทั้งหมดมาแสดงในโปรไฟล์
-                            document.getElementById("profileName").innerText = data.prefix + data.name;
-                            document.getElementById("profileSchool").innerText = data.school;
-                            document.getElementById("profileLevel").innerText = data.level;
-                            document.getElementById("profilePhone").innerText = data.phone;
-                            document.getElementById("profileEmail").innerText = data.email;
+                            showProfile(data);
                         } else {
                             document.getElementById("registerSection").style.display = "block";
                         }
                     } catch (e) {
+                        console.error(e);
                         alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
                         document.getElementById("registerSection").style.display = "block";
                     }
@@ -168,7 +181,6 @@
         }
 
         function register() {
-            // ดึงข้อมูลจากทุกช่อง
             const prefix = document.getElementById("prefix").value;
             const name = document.getElementById("name").value.trim();
             const school = document.getElementById("school").value.trim();
@@ -177,9 +189,19 @@
             const email = document.getElementById("email").value.trim();
             const btn = document.getElementById("btnRegister");
 
-            // ตรวจสอบเฉพาะช่องที่บังคับ (คำนำหน้า, ชื่อ, โรงเรียน, ระดับชั้น)
+            // ช่องบังคับ
             if (!prefix || !name || !school || !level) {
                 alert("กรุณากรอกข้อมูลที่จำเป็น (คำนำหน้า, ชื่อ-สกุล, โรงเรียน, ระดับชั้น) ให้ครบถ้วน");
+                return;
+            }
+
+            // ตรวจรูปแบบเฉพาะกรณีที่กรอกมา
+            if (phone && !/^0\d{9}$/.test(phone)) {
+                alert("กรุณากรอกเบอร์โทรศัพท์ 10 หลัก ขึ้นต้นด้วย 0");
+                return;
+            }
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert("รูปแบบอีเมลไม่ถูกต้อง");
                 return;
             }
 
@@ -193,8 +215,8 @@
                 name: name,
                 school: school,
                 level: level,
-                phone: phone || "-", // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
-                email: email || "-"   // ถ้าไม่ได้กรอก จะบันทึกเป็น "-" ให้ใน Google Sheets
+                phone: phone || "-",
+                email: email || "-"
             };
 
             fetch(GAS_URL, {
@@ -203,16 +225,14 @@
                 body: JSON.stringify(payload)
             })
                 .then(() => {
-                    document.getElementById("registerSection").style.display = "none";
-                    document.getElementById("profileSection").style.display = "block";
-
-                    // อัปเดตข้อมูลในหน้าโปรไฟล์
-                    document.getElementById("profileName").innerText = prefix + name;
-                    document.getElementById("profileSchool").innerText = school;
-                    document.getElementById("profileLevel").innerText = level;
-                    document.getElementById("profilePhone").innerText = phone || "-";
-                    document.getElementById("profileEmail").innerText = email || "-";
-
+                    showProfile({
+                        prefix: prefix,
+                        name: name,
+                        school: school,
+                        level: level,
+                        phone: phone,
+                        email: email
+                    });
                 }).catch((error) => {
                     alert("เกิดข้อผิดพลาดตอนบันทึก: " + error.message);
                     btn.innerText = "ยืนยันการลงทะเบียน";
