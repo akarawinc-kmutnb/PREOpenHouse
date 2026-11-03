@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+    <h2>ลงทะเบียน Open House</h2>
+    <input type="text" id="name" placeholder="ชื่อ-สกุล"><br><br>
+    <input type="text" id="school" placeholder="โรงเรียน"><br><br>
+    <button onclick="register()">ลงทะเบียน</button>
+
+    <script>
+        const LIFF_ID = "ใส่_LIFF_ID_สำหรับลงทะเบียน";
+        const GAS_URL = "ใส่_WEB_APP_URL_จากข้อ2";
+        let userId = "";
+
+        liff.init({ liffId: LIFF_ID }).then(() => {
+            if (liff.isLoggedIn()) {
+                liff.getProfile().then(profile => { userId = profile.userId; });
+            } else {
+                liff.login();
+            }
+        });
+
+        function register() {
+            const name = document.getElementById("name").value;
+            const school = document.getElementById("school").value;
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "register", userId: userId, name: name, school: school })
+            }).then(() => {
+                alert("ลงทะเบียนสำเร็จ!");
+                liff.closeWindow();
+            });
+        }
+    </script>
+</body>
+</html>
