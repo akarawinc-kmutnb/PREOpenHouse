@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>แลกรับของรางวัล Open House</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- LINE LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <div class="header-bg" style="height: 140px;"></div>
+
+        <div class="content" style="padding-bottom: 60px;">
+            <!-- Header Section -->
+            <div class="header-content" style="margin-bottom: 20px;">
+                <img src="src/PRE-LOGO.png" alt="PRE Logo" class="app-logo">
+                <div class="header-text">
+                    <h2>REWARD CENTER</h2>
+                    <h3>แลกรับของรางวัล Open House</h3>
+                </div>
+            </div>
+
+            <!-- Loading Section -->
+            <div id="loading" style="display: block;">
+                <div class="loader-box">
+                    <div class="loader-circle"></div>
+                    <div class="loader-circle"></div>
+                </div>
+                <div class="loading-text">กำลังตรวจสอบข้อมูลการเข้าฐาน...</div>
+            </div>
+
+            <!-- Card แสดงผล -->
+            <div id="rewardCard" class="profile-card" style="display: none; padding: 25px 20px;">
+                <h3 id="rewardTitle" style="margin-top: 0; color: #333;">สถานะการสะสมฐาน</h3>
+                <p id="rewardSubTitle" style="color: #666; font-size: 14px; margin-bottom: 20px;">-</p>
+
+                <!-- รายชื่อฐานกิจกรรม -->
+                <div id="stationList" style="text-align: left; margin-bottom: 20px;"></div>
+
+                <!-- ปุ่มกดสำหรับเจ้าหน้าที่ (กดเพื่อยืนยันการให้ของรางวัล) -->
+                <button id="btnRedeem" style="display: none;"
+                    onclick="redeemReward()">เจ้าหน้าที่กดเพื่อมอบของรางวัล</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div
+            style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; color: #888; font-size: 12px;">
+            © 2026 Akarawin Chaorungmatee. All rights reserved.
+        </div>
+    </div>
+
+    <!-- Script File -->
+    <script src="reward.js"></script>
+</body>
+
+</html>

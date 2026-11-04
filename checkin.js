@@ -1,7 +1,7 @@
 const LIFF_ID = "2012346461-CB2TtFns"; 
 // LIFF URL สำหรับหน้าลงทะเบียนหลัก ( index.html )
 const REGISTER_LIFF_URL = "https://liff.line.me/2012346461-aXrfKbyZ"; 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exechttps://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
 // รายชื่อฐานกิจกรรมที่ถูกต้อง
 const validStations = [
