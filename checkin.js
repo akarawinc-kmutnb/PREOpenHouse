@@ -1,7 +1,9 @@
 const LIFF_ID = "2012346461-CB2TtFns"; 
+// LIFF URL สำหรับหน้าลงทะเบียนหลัก ( index.html )
+const REGISTER_LIFF_URL = "https://liff.line.me/2012346461-aXrfKbyZ"; 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
-// รายชื่อฐานกิจกรรมที่ถูกต้องตามที่อัปเดตใหม่
+// รายชื่อฐานกิจกรรมที่ถูกต้อง
 const validStations = [
     "MachineToolLab", 
     "DigitalManufacturing", 
@@ -15,10 +17,8 @@ const validStations = [
 liff.init({ liffId: LIFF_ID }).then(() => {
     if (liff.isLoggedIn()) {
         liff.getProfile().then(profile => {
-            // ดึงค่า station จาก URL หรือ liff.state หลังล็อกอินเรียบร้อยแล้ว
             const stationName = getStationParam();
 
-            // ตรวจสอบความถูกต้องของฐานกิจกรรม
             if (!stationName || !validStations.includes(stationName)) {
                 showResult("❌ ไม่พบฐานกิจกรรม", "QR Code ไม่ถูกต้อง หรือไม่มีฐานนี้ในระบบ", false);
             } else {
@@ -32,12 +32,11 @@ liff.init({ liffId: LIFF_ID }).then(() => {
     showResult("❌ เกิดข้อผิดพลาดในการโหลด LIFF", err.message, false);
 });
 
-// ฟังก์ชันสำหรับแกะค่า station ออกมาจาก URL หรือ liff.state
+// ฟังก์ชันแกะค่า station ออกมาจาก URL หรือ liff.state
 function getStationParam() {
     const urlParams = new URLSearchParams(window.location.search);
     let station = urlParams.get('station');
 
-    // ถ้าไม่เจอใน search ปกติ ให้หาจาก liff.state
     if (!station) {
         const liffState = urlParams.get('liff.state');
         if (liffState) {
@@ -49,17 +48,17 @@ function getStationParam() {
     return station;
 }
 
-// 1. ตรวจสอบว่าผู้ใช้ลงทะเบียนหรือยัง
+// 1. ตรวจสอบสถานะการลงทะเบียนของผู้ใช้งาน
 function verifyAndCheckin(uid, station) {
     fetch(GAS_URL + "?action=checkUser&userId=" + encodeURIComponent(uid))
     .then(response => response.json())
     .then(data => {
         if (data.status !== "found") {
-            // ยังไม่ได้ลงทะเบียน พาไปหน้าลงทะเบียน index.html
+            // ยังไม่ได้ลงทะเบียน -> เปลี่ยนทางไปยัง LIFF URL ของหน้าลงทะเบียนโดยตรง
             alert("คุณยังไม่ได้ลงทะเบียน กรุณาลงทะเบียนก่อนเข้าฐานกิจกรรมครับ");
-            window.location.href = "index.html"; 
+            window.location.href = REGISTER_LIFF_URL; 
         } else {
-            // ลงทะเบียนแล้ว บันทึกการเช็คอิน
+            // ลงทะเบียนเรียบร้อยแล้ว -> ทำการเช็คอิน
             sendCheckinGET(uid, station);
         }
     })
@@ -68,17 +67,15 @@ function verifyAndCheckin(uid, station) {
     });
 }
 
-// 2. ส่งข้อมูลเช็คอินและตรวจเช็คการซ้ำ
+// 2. ส่งข้อมูลเช็คอินและตรวจเช็คการบันทึกซ้ำ
 function sendCheckinGET(uid, station) {
     fetch(GAS_URL + "?action=processCheckin&userId=" + encodeURIComponent(uid) + "&station=" + encodeURIComponent(station))
     .then(response => response.json())
     .then(data => {
         if (data.status === "duplicate") {
-            // กรณีเคยเช็คอินไปแล้ว
             showResult("⚠️ เคยเช็คอินแล้ว", "เมื่อเวลา: " + data.time, false);
-            document.getElementById("status").style.color = "#ff9800"; // เปลี่ยนสีเป็นสีส้มเตือน
+            document.getElementById("status").style.color = "#ff9800";
         } else if (data.status === "success") {
-            // เช็คอินใหม่สำเร็จ
             showResult("✅ เช็คอินสำเร็จ!", "ฐาน: " + station, true);
             setTimeout(() => {
                 if (liff.isInClient()) liff.closeWindow();
