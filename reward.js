@@ -1,20 +1,22 @@
-// ใส่ LIFF ID สำหรับหน้าแลกรางวัล (หรือใช้ ID เดียวกับหน้าลงทะเบียนก็ได้)
-const LIFF_ID = "2012346461-aXrfKbyZ";
+// LIFF ID สำหรับหน้าแลกรางวัล
+const LIFF_ID = "2012346461-eGkNnxR3"; 
+// LIFF URL สำหรับหน้าลงทะเบียนหลัก (กรณีผู้ใช้งานยังไม่ได้ลงทะเบียน)
 const REGISTER_LIFF_URL = "https://liff.line.me/2012346461-aXrfKbyZ";
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
-// รายชื่อ 6 ฐานทั้งหมดที่ต้องเข้า
+// รายชื่อ 6 ฐานทั้งหมดที่ต้องเข้าชม
 const allStations = [
-    "MachineToolLab",
-    "DigitalManufacturing",
-    "AutomationLab",
-    "FormingLabs",
-    "MaterialTesting",
+    "MachineToolLab", 
+    "DigitalManufacturing", 
+    "AutomationLab", 
+    "FormingLabs", 
+    "MaterialTesting", 
     "Metrology"
 ];
 
 let currentUserId = "";
 
+// เริ่มต้นระบบ LIFF
 liff.init({ liffId: LIFF_ID }).then(() => {
     if (liff.isLoggedIn()) {
         liff.getProfile().then(profile => {
@@ -32,50 +34,50 @@ liff.init({ liffId: LIFF_ID }).then(() => {
 // ตรวจสอบสถานะการสะสมฐานและการแลกรางวัล
 function checkRewardStatus(uid) {
     fetch(GAS_URL + "?action=checkReward&userId=" + encodeURIComponent(uid))
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("rewardCard").style.display = "block";
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("rewardCard").style.display = "block";
 
-            if (data.status === "not_registered") {
-                alert("คุณยังไม่ได้ลงทะเบียน กรุณาลงทะเบียนก่อนครับ");
-                window.location.href = REGISTER_LIFF_URL;
-                return;
-            }
+        if (data.status === "not_registered") {
+            alert("คุณยังไม่ได้ลงทะเบียน กรุณาลงทะเบียนก่อนรับของรางวัลครับ");
+            window.location.href = REGISTER_LIFF_URL;
+            return;
+        }
 
-            const completedStations = data.completedStations || [];
-            const isRedeemed = data.isRedeemed; // true หากแลกรางวัลไปแล้ว
+        const completedStations = data.completedStations || [];
+        const isRedeemed = data.isRedeemed; // true หากรับของรางวัลไปแล้ว
 
-            renderStationList(completedStations);
+        renderStationList(completedStations);
 
-            const titleEl = document.getElementById("rewardTitle");
-            const subTitleEl = document.getElementById("rewardSubTitle");
-            const btnRedeem = document.getElementById("btnRedeem");
+        const titleEl = document.getElementById("rewardTitle");
+        const subTitleEl = document.getElementById("rewardSubTitle");
+        const btnRedeem = document.getElementById("btnRedeem");
 
-            if (isRedeemed) {
-                titleEl.innerText = "🎁 รับของรางวัลเรียบร้อยแล้ว";
-                titleEl.style.color = "#2e7d32";
-                subTitleEl.innerText = "ขอบคุณที่เข้าร่วมกิจกรรม Open House 2027 ครับ!";
-                btnRedeem.style.display = "none";
-            } else if (completedStations.length === allStations.length) {
-                titleEl.innerText = "🎉 ยินดีด้วย! คุณเข้าครบทุกฐานแล้ว";
-                titleEl.style.color = "#ff7a18";
-                subTitleEl.innerText = "ยื่นหน้าจอนี้ให้เจ้าหน้าที่เพื่อกดรับของรางวัล";
-                btnRedeem.style.display = "block";
-            } else {
-                titleEl.innerText = `สะสมได้ ${completedStations.length} / ${allStations.length} ฐาน`;
-                titleEl.style.color = "#c62828";
-                subTitleEl.innerText = "เข้าชมและเช็คอินให้ครบทุกฐานเพื่อรับของรางวัลสุดพิเศษ";
-                btnRedeem.style.display = "none";
-            }
-        })
-        .catch(err => {
-            document.getElementById("loading").style.display = "none";
-            alert("ไม่สามารถดึงข้อมูลได้: " + err.message);
-        });
+        if (isRedeemed) {
+            titleEl.innerText = "🎁 รับของรางวัลเรียบร้อยแล้ว";
+            titleEl.style.color = "#2e7d32";
+            subTitleEl.innerText = "ขอบคุณที่เข้าร่วมกิจกรรม Open House 2027 ครับ!";
+            btnRedeem.style.display = "none";
+        } else if (completedStations.length === allStations.length) {
+            titleEl.innerText = "🎉 ยินดีด้วย! คุณเข้าครบทุกฐานแล้ว";
+            titleEl.style.color = "#ff7a18";
+            subTitleEl.innerText = "ยื่นหน้าจอนี้ให้เจ้าหน้าที่เพื่อกดรับของรางวัล";
+            btnRedeem.style.display = "block";
+        } else {
+            titleEl.innerText = `สะสมได้ ${completedStations.length} / ${allStations.length} ฐาน`;
+            titleEl.style.color = "#c62828";
+            subTitleEl.innerText = "เข้าชมและเช็คอินให้ครบทุกฐานเพื่อรับของรางวัลสุดพิเศษ";
+            btnRedeem.style.display = "none";
+        }
+    })
+    .catch(err => {
+        document.getElementById("loading").style.display = "none";
+        alert("ไม่สามารถดึงข้อมูลได้: " + err.message);
+    });
 }
 
-// แสดงรายการฐานว่าผ่านฐานไหนแล้วบ้าง
+// แสดงรายการฐานกิจกรรม
 function renderStationList(completedStations) {
     const listEl = document.getElementById("stationList");
     let html = "";
@@ -95,29 +97,29 @@ function renderStationList(completedStations) {
     listEl.innerHTML = html;
 }
 
-// ฟังก์ชันเมื่อเจ้าหน้าที่กดปุ่มรับของรางวัล
+// ฟังก์ชันสำหรับเจ้าหน้าที่กดมอบของรางวัล
 function redeemReward() {
-    if (confirm("ยืนยันการมอบของรางวัลแก่ผู้เข้าร่วมงานท่านนี้? (กดได้ครั้งเดียว)")) {
+    if (confirm("ยืนยันการมอบของรางวัลแก่ผู้เข้าร่วมงานท่านนี้? (สามารถกดได้เพียงครั้งเดียว)")) {
         const btn = document.getElementById("btnRedeem");
         btn.innerText = "กำลังบันทึก...";
         btn.disabled = true;
 
         fetch(GAS_URL + "?action=redeemReward&userId=" + encodeURIComponent(currentUserId))
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") {
-                    alert("บันทึกการรับของรางวัลสำเร็จ!");
-                    checkRewardStatus(currentUserId);
-                } else {
-                    alert("เกิดข้อผิดพลาด: " + data.message);
-                    btn.innerText = "เจ้าหน้าที่กดเพื่อมอบของรางวัล";
-                    btn.disabled = false;
-                }
-            })
-            .catch(err => {
-                alert("บันทึกไม่สำเร็จ: " + err.message);
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("บันทึกการรับของรางวัลเรียบร้อยแล้ว!");
+                checkRewardStatus(currentUserId);
+            } else {
+                alert("เกิดข้อผิดพลาด: " + data.message);
                 btn.innerText = "เจ้าหน้าที่กดเพื่อมอบของรางวัล";
                 btn.disabled = false;
-            });
+            }
+        })
+        .catch(err => {
+            alert("บันทึกไม่สำเร็จ: " + err.message);
+            btn.innerText = "เจ้าหน้าที่กดเพื่อมอบของรางวัล";
+            btn.disabled = false;
+        });
     }
 }
