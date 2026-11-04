@@ -5,8 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>เช็คอินฐานกิจกรรม</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Style CSS -->
     <link rel="stylesheet" href="style.css">
+    <!-- LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 
@@ -33,61 +36,7 @@
         </div>
     </div>
 
-    <script>
-        // 1. ระบุ LIFF ID ให้ถูกต้อง (ใช้ ID เดียวกับหน้าลงทะเบียน หรือ ID สำหรับ Checkin)
-        const LIFF_ID = "2012346461-CB2TtFns"; 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
-
-        // ดึงชื่อฐานจาก URL (เช่น ?station=Robot)
-        const urlParams = new URLSearchParams(window.location.search);
-        const stationName = urlParams.get('station') || "กิจกรรม";
-
-        liff.init({ liffId: LIFF_ID }).then(() => {
-            if (liff.isLoggedIn()) {
-                liff.getProfile().then(profile => {
-                    sendCheckin(profile.userId, stationName);
-                });
-            } else {
-                liff.login();
-            }
-        }).catch(err => {
-            showResult("❌ เกิดข้อผิดพลาดในการโหลด LIFF", err.message, false);
-        });
-
-        function sendCheckin(uid, station) {
-            fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'no-cors', // ป้องกันการติด CORS
-                body: JSON.stringify({
-                    action: "checkin",
-                    userId: uid,
-                    station: station
-                })
-            })
-            .then(() => {
-                showResult("✅ เช็คอินสำเร็จ!", "ฐาน: " + station, true);
-                // ปิดหน้าต่าง LIFF อัตโนมัติใน 2.5 วินาที
-                setTimeout(() => {
-                    if (liff.isInClient()) {
-                        liff.closeWindow();
-                    }
-                }, 2500);
-            })
-            .catch(error => {
-                showResult("❌ บันทึกไม่สำเร็จ", error.message, false);
-            });
-        }
-
-        function showResult(title, subtitle, isSuccess) {
-            document.getElementById("checkinLoader").style.display = "none";
-            const statusEl = document.getElementById("status");
-            const subStatusEl = document.getElementById("subStatus");
-            
-            statusEl.innerText = title;
-            statusEl.style.color = isSuccess ? "#2e7d32" : "#c62828";
-            subStatusEl.innerText = subtitle;
-        }
-    </script>
+    <script src="checkin.js"></script>
 </body>
 
 </html>
