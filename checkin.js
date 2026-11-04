@@ -37,9 +37,7 @@ function verifyAndCheckin(uid, station) {
     .then(response => response.json())
     .then(data => {
         if (data.status !== "found") {
-            // ถ้ายังไม่ลงทะเบียน ให้รีไดเรกต์ไปหน้าลงทะเบียน
-            alert("คุณยังไม่ได้ลงทะเบียน กรุณาลงทะเบียนก่อนเข้าฐานกิจกรรมครับ");
-            window.location.href = "index.html"; 
+            window.location.href = "https://liff.line.me/2012346461-aXrfKbyZ"; 
         } else {
             // ถ้าลงทะเบียนแล้ว ไปขั้นตอนเช็คอิน
             sendCheckinGET(uid, station);
