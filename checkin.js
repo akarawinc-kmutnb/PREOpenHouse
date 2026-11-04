@@ -1,7 +1,7 @@
 const LIFF_ID = "2012346461-CB2TtFns"; 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
-// 1. กำหนดรายชื่อฐานกิจกรรมที่มีทั้งหมดในงาน (พิมพ์ให้ตรงกับตัวพิมพ์เล็ก/ใหญ่)
+// 1. กำหนดรายชื่อฐานกิจกรรมที่มีทั้งหมดในงาน
 const validStations = [
     "Robot",
     "CNC",
@@ -9,12 +9,22 @@ const validStations = [
     "กิจกรรม"
 ]; 
 
+// 2. ดึงค่า Parameter จาก URL
 const urlParams = new URLSearchParams(window.location.search);
-const stationName = urlParams.get('station'); 
+let stationName = urlParams.get('station');
 
-// 2. ตรวจสอบว่ามีค่า station ส่งมา และชื่อฐานตรงกับที่กำหนดไว้หรือไม่
+// 3. กรณีเข้าผ่านลิงก์ liff.line.me พารามิเตอร์จะถูกซ่อนอยู่ใน liff.state
+if (!stationName) {
+    const liffState = urlParams.get('liff.state');
+    if (liffState) {
+        // ถอดรหัส liff.state ออกมาหาค่า station อีกครั้ง
+        const stateParams = new URLSearchParams(liffState);
+        stationName = stateParams.get('station');
+    }
+}
+
+// 4. ตรวจสอบว่ามีค่า station ส่งมา และชื่อฐานตรงกับที่กำหนดไว้หรือไม่
 if (!stationName || !validStations.includes(stationName)) {
-    // ถ้าชื่อฐานไม่มี หรือไม่ตรงกับใน validStations จะแสดง Error ทันที
     showResult("❌ ไม่พบฐานกิจกรรม", "QR Code ไม่ถูกต้อง หรือไม่มีฐานนี้ในระบบ", false);
 } else {
     // ถ้าชื่อฐานถูกต้อง ให้เริ่มทำงานระบบ LIFF
