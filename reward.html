@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>แลกรับของรางวัล Open House</title>
+    <title>บัตรสะสมแสตมป์ Open House</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Style CSS -->
@@ -20,11 +20,11 @@
 
         <div class="content" style="padding-bottom: 60px;">
             <!-- Header Section -->
-            <div class="header-content" style="margin-bottom: 20px;">
+            <div class="header-content" style="margin-bottom: 15px;">
                 <img src="src/PRE-LOGO.png" alt="PRE Logo" class="app-logo">
                 <div class="header-text">
-                    <h2>REWARD CENTER</h2>
-                    <h3>แลกรับของรางวัล Open House</h3>
+                    <h2>OPEN HOUSE STAMP CARD</h2>
+                    <h3>สะสมแสตมป์แลกรับของรางวัล</h3>
                 </div>
             </div>
 
@@ -34,26 +34,28 @@
                     <div class="loader-circle"></div>
                     <div class="loader-circle"></div>
                 </div>
-                <div class="loading-text">กำลังตรวจสอบข้อมูลการเข้าฐาน...</div>
+                <div class="loading-text">กำลังโหลดบัตรสะสมแสตมป์...</div>
             </div>
 
-            <!-- Card แสดงผล -->
-            <div id="rewardCard" class="profile-card" style="display: none; padding: 25px 20px;">
-                <h3 id="rewardTitle" style="margin-top: 0; color: #333;">สถานะการสะสมฐาน</h3>
-                <p id="rewardSubTitle" style="color: #666; font-size: 14px; margin-bottom: 20px;">-</p>
+            <!-- Stamp Card Main Container -->
+            <div id="rewardCard" class="profile-card" style="display: none; padding: 20px 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px dashed #f0f0f0; padding-bottom: 10px;">
+                    <h3 id="rewardTitle" style="margin: 0; color: #333; font-size: 18px;">บัตรสะสมแสตมป์</h3>
+                    <span id="stampCountBadge" style="background: #e0e0e0; color: #555; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px;">0 / 6</span>
+                </div>
 
-                <!-- รายชื่อฐานกิจกรรม -->
-                <div id="stationList" style="text-align: left; margin-bottom: 20px;"></div>
+                <!-- Grid แสดงตราแสตมป์ 6 ช่อง -->
+                <div id="stampGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;"></div>
 
-                <!-- ปุ่มกดสำหรับเจ้าหน้าที่ (กดเพื่อยืนยันการให้ของรางวัล) -->
-                <button id="btnRedeem" style="display: none;"
-                    onclick="redeemReward()">เจ้าหน้าที่กดเพื่อมอบของรางวัล</button>
+                <p id="rewardSubTitle" style="color: #666; font-size: 13px; margin-bottom: 15px; text-align: center;">-</p>
+
+                <!-- ปุ่มกดสำหรับเจ้าหน้าที่ -->
+                <button id="btnRedeem" style="display: none; background: linear-gradient(135deg, #ff7a18 0%, #af002d 100%); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer;" onclick="redeemReward()">เจ้าหน้าที่กดเพื่อมอบของรางวัล</button>
             </div>
         </div>
 
         <!-- Footer -->
-        <div
-            style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; color: #888; font-size: 12px;">
+        <div style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; color: #888; font-size: 12px;">
             © 2026 Akarawin Chaorungmatee. All rights reserved.
         </div>
     </div>

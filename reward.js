@@ -1,22 +1,19 @@
-// LIFF ID สำหรับหน้าแลกรางวัล
 const LIFF_ID = "2012346461-eGkNnxR3"; 
-// LIFF URL สำหรับหน้าลงทะเบียนหลัก (กรณีผู้ใช้งานยังไม่ได้ลงทะเบียน)
 const REGISTER_LIFF_URL = "https://liff.line.me/2012346461-aXrfKbyZ";
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
-// รายชื่อ 6 ฐานทั้งหมดที่ต้องเข้าชม
+// กำหนดชื่อฐานและชื่อย่อแสดงบนแสตมป์
 const allStations = [
-    "MachineToolLab", 
-    "DigitalManufacturing", 
-    "AutomationLab", 
-    "FormingLabs", 
-    "MaterialTesting", 
-    "Metrology"
+    { id: "MachineToolLab", name: "Machine Tool" },
+    { id: "DigitalManufacturing", name: "Digital Mfg." },
+    { id: "AutomationLab", name: "Automation" },
+    { id: "FormingLabs", name: "Forming" },
+    { id: "MaterialTesting", name: "Material Testing" },
+    { id: "Metrology", name: "Metrology" }
 ];
 
 let currentUserId = "";
 
-// เริ่มต้นระบบ LIFF
 liff.init({ liffId: LIFF_ID }).then(() => {
     if (liff.isLoggedIn()) {
         liff.getProfile().then(profile => {
@@ -31,7 +28,6 @@ liff.init({ liffId: LIFF_ID }).then(() => {
     alert("เกิดข้อผิดพลาดในการโหลด LIFF: " + err.message);
 });
 
-// ตรวจสอบสถานะการสะสมฐานและการแลกรางวัล
 function checkRewardStatus(uid) {
     fetch(GAS_URL + "?action=checkReward&userId=" + encodeURIComponent(uid))
     .then(res => res.json())
@@ -40,34 +36,42 @@ function checkRewardStatus(uid) {
         document.getElementById("rewardCard").style.display = "block";
 
         if (data.status === "not_registered") {
-            alert("คุณยังไม่ได้ลงทะเบียน กรุณาลงทะเบียนก่อนรับของรางวัลครับ");
+            alert("คุณยังไม่ได้ลงทะเบียน กรุณาลงทะเบียนก่อนครับ");
             window.location.href = REGISTER_LIFF_URL;
             return;
         }
 
         const completedStations = data.completedStations || [];
-        const isRedeemed = data.isRedeemed; // true หากรับของรางวัลไปแล้ว
+        const isRedeemed = data.isRedeemed;
 
-        renderStationList(completedStations);
+        // วาดแสตมป์บนการ์ด
+        renderStampGrid(completedStations);
 
         const titleEl = document.getElementById("rewardTitle");
         const subTitleEl = document.getElementById("rewardSubTitle");
+        const badgeEl = document.getElementById("stampCountBadge");
         const btnRedeem = document.getElementById("btnRedeem");
 
+        badgeEl.innerText = `${completedStations.length} / ${allStations.length}`;
+
         if (isRedeemed) {
-            titleEl.innerText = "🎁 รับของรางวัลเรียบร้อยแล้ว";
+            titleEl.innerText = "🎁 รับของรางวัลแล้ว";
             titleEl.style.color = "#2e7d32";
+            badgeEl.style.background = "#e8f5e9";
+            badgeEl.style.color = "#2e7d32";
             subTitleEl.innerText = "ขอบคุณที่เข้าร่วมกิจกรรม Open House 2027 ครับ!";
             btnRedeem.style.display = "none";
         } else if (completedStations.length === allStations.length) {
-            titleEl.innerText = "🎉 ยินดีด้วย! คุณเข้าครบทุกฐานแล้ว";
+            titleEl.innerText = "🎉 สะสมแสตมป์ครบแล้ว!";
             titleEl.style.color = "#ff7a18";
+            badgeEl.style.background = "#fff3e0";
+            badgeEl.style.color = "#e65100";
             subTitleEl.innerText = "ยื่นหน้าจอนี้ให้เจ้าหน้าที่เพื่อกดรับของรางวัล";
             btnRedeem.style.display = "block";
         } else {
-            titleEl.innerText = `สะสมได้ ${completedStations.length} / ${allStations.length} ฐาน`;
-            titleEl.style.color = "#c62828";
-            subTitleEl.innerText = "เข้าชมและเช็คอินให้ครบทุกฐานเพื่อรับของรางวัลสุดพิเศษ";
+            titleEl.innerText = "บัตรสะสมแสตมป์";
+            titleEl.style.color = "#333";
+            subTitleEl.innerText = "สแกน QR Code เช็คอินให้ครบ 6 ฐานเพื่อรับของรางวัล";
             btnRedeem.style.display = "none";
         }
     })
@@ -77,27 +81,68 @@ function checkRewardStatus(uid) {
     });
 }
 
-// แสดงรายการฐานกิจกรรม
-function renderStationList(completedStations) {
-    const listEl = document.getElementById("stationList");
+// ฟังก์ชันสร้างการ์ดแสตมป์ (Stamp Grid)
+function renderStampGrid(completedStations) {
+    const gridEl = document.getElementById("stampGrid");
     let html = "";
 
-    allStations.forEach(st => {
-        const isDone = completedStations.includes(st);
+    allStations.forEach((st, index) => {
+        const isDone = completedStations.includes(st.id);
+        
         html += `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee;">
-                <span style="color: #333; font-weight: 500;">${st}</span>
-                <span style="font-weight: 600; color: ${isDone ? '#2e7d32' : '#bbb'};">
-                    ${isDone ? '✅ เช็คอินแล้ว' : '⚪ ยังไม่เข้า'}
-                </span>
+            <div style="
+                background: ${isDone ? '#f0fdf4' : '#fafafa'}; 
+                border: 2px ${isDone ? 'solid #2e7d32' : 'dashed #ddd'}; 
+                border-radius: 12px; 
+                padding: 12px 8px; 
+                text-align: center; 
+                position: relative;
+                box-shadow: ${isDone ? '0 2px 8px rgba(46,125,50,0.15)' : 'none'};
+            ">
+                <!-- ตัวเลขลำดับฐาน -->
+                <div style="position: absolute; top: 6px; left: 8px; font-size: 10px; color: #999; font-weight: 600;">#0${index + 1}</div>
+                
+                <!-- ไอคอนแสตมป์ -->
+                <div style="margin: 8px 0 4px 0;">
+                    ${isDone 
+                        ? `<div style="
+                            display: inline-flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            width: 44px; 
+                            height: 44px; 
+                            background: #2e7d32; 
+                            color: white; 
+                            border-radius: 50%; 
+                            font-size: 20px;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            transform: rotate(-5deg);
+                           ">PASSED</div>` 
+                        : `<div style="
+                            display: inline-flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            width: 44px; 
+                            height: 44px; 
+                            background: #eee; 
+                            color: #aaa; 
+                            border-radius: 50%; 
+                            font-size: 18px;
+                           ">⚪</div>`
+                    }
+                </div>
+                
+                <!-- ชื่อฐาน -->
+                <div style="font-size: 12px; font-weight: 500; color: ${isDone ? '#2e7d32' : '#666'};">
+                    ${st.name}
+                </div>
             </div>
         `;
     });
 
-    listEl.innerHTML = html;
+    gridEl.innerHTML = html;
 }
 
-// ฟังก์ชันสำหรับเจ้าหน้าที่กดมอบของรางวัล
 function redeemReward() {
     if (confirm("ยืนยันการมอบของรางวัลแก่ผู้เข้าร่วมงานท่านนี้? (สามารถกดได้เพียงครั้งเดียว)")) {
         const btn = document.getElementById("btnRedeem");
