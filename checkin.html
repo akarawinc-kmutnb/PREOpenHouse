@@ -1,33 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
+
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>เช็คอินฐานกิจกรรม</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
+
 <body>
-    <h2 id="status">กำลังเช็คอิน...</h2>
+
+    <div class="app-container">
+        <div class="header-bg" style="height: 140px;"></div>
+
+        <div class="content">
+            <div class="profile-card" style="margin-top: 40px; padding: 40px 20px;">
+                <div class="loader-box" id="checkinLoader">
+                    <div class="loader-circle"></div>
+                    <div class="loader-circle"></div>
+                </div>
+                
+                <h2 id="status" style="color: #333; text-shadow: none; margin: 10px 0; font-size: 20px;">
+                    กำลังเช็คอิน...
+                </h2>
+                
+                <p id="subStatus" style="color: #888; font-size: 14px; margin: 0;">
+                    กรุณารอสักครู่ ระบบกำลังบันทึกข้อมูล
+                </p>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const LIFF_ID = "https://akarawinc-kmutnb.github.io/PREOpenHouse/checkin";
+        // 1. ระบุ LIFF ID ให้ถูกต้อง (ใช้ ID เดียวกับหน้าลงทะเบียน หรือ ID สำหรับ Checkin)
+        const LIFF_ID = "2012346461-CB2TtFns"; 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
-        
-        // ดึงชื่อฐานจาก URL (เช่น ?station=Math)
+
+        // ดึงชื่อฐานจาก URL (เช่น ?station=Robot)
         const urlParams = new URLSearchParams(window.location.search);
-        const stationName = urlParams.get('station');
+        const stationName = urlParams.get('station') || "กิจกรรม";
 
         liff.init({ liffId: LIFF_ID }).then(() => {
             if (liff.isLoggedIn()) {
                 liff.getProfile().then(profile => {
-                    fetch(GAS_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: "checkin", userId: profile.userId, station: stationName })
-                    }).then(() => {
-                        document.getElementById("status").innerText = "เช็คอินฐาน " + stationName + " สำเร็จ!";
-                        setTimeout(() => liff.closeWindow(), 2000);
-                    });
+                    sendCheckin(profile.userId, stationName);
                 });
             } else {
                 liff.login();
             }
+        }).catch(err => {
+            showResult("❌ เกิดข้อผิดพลาดในการโหลด LIFF", err.message, false);
         });
+
+        function sendCheckin(uid, station) {
+            fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors', // ป้องกันการติด CORS
+                body: JSON.stringify({
+                    action: "checkin",
+                    userId: uid,
+                    station: station
+                })
+            })
+            .then(() => {
+                showResult("✅ เช็คอินสำเร็จ!", "ฐาน: " + station, true);
+                // ปิดหน้าต่าง LIFF อัตโนมัติใน 2.5 วินาที
+                setTimeout(() => {
+                    if (liff.isInClient()) {
+                        liff.closeWindow();
+                    }
+                }, 2500);
+            })
+            .catch(error => {
+                showResult("❌ บันทึกไม่สำเร็จ", error.message, false);
+            });
+        }
+
+        function showResult(title, subtitle, isSuccess) {
+            document.getElementById("checkinLoader").style.display = "none";
+            const statusEl = document.getElementById("status");
+            const subStatusEl = document.getElementById("subStatus");
+            
+            statusEl.innerText = title;
+            statusEl.style.color = isSuccess ? "#2e7d32" : "#c62828";
+            subStatusEl.innerText = subtitle;
+        }
     </script>
 </body>
+
 </html>
