@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>ระบบเจ้าหน้าที่ - สแกนแลกของรางวัล</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- html5-qrcode SDK สำหรับสแกนบาร์โค้ดจากกล้อง -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header-bg" style="height: 120px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);"></div>
+
+        <div class="content">
+            <div class="header-content" style="margin-bottom: 15px;">
+                <h2 style="color: #1e3c72; margin: 0;">STAFF SCANNER</h2>
+                <h4 style="color: #666; margin: 5px 0 0 0;">สแกน Barcode ยืนยันการรับรางวัล</h4>
+            </div>
+
+            <div class="profile-card" style="padding: 15px;">
+                <!-- กล้องสแกน -->
+                <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden;"></div>
+                
+                <div id="scanStatus" style="margin-top: 15px; font-weight: 500; color: #555; text-align: center;">
+                    📷 ส่องกล้องไปที่ Barcode บนจอนักเรียน
+                </div>
+            </div>
+        </div>
+
+        <div style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; color: #888; font-size: 12px;">
+            © 2026 Akarawin Chaorungmatee. All rights reserved.
+        </div>
+    </div>
+
+    <script src="staff.js"></script>
+</body>
+</html>

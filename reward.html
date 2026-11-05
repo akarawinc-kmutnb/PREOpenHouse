@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="style.css">
     <!-- LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <!-- JsBarcode SDK สำหรับสร้างบาร์โค้ด -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 </head>
 
 <body>
@@ -45,12 +47,17 @@
                 </div>
 
                 <!-- Grid แสดงตราแสตมป์ 6 ช่อง -->
-                <div id="stampGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;"></div>
+                <div id="stampGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;"></div>
 
                 <p id="rewardSubTitle" style="color: #666; font-size: 13px; margin-bottom: 15px; text-align: center;">-</p>
 
-                <!-- ปุ่มกดสำหรับเจ้าหน้าที่ -->
-                <button id="btnRedeem" style="display: none; background: linear-gradient(135deg, #ff7a18 0%, #af002d 100%); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer;" onclick="redeemReward()">เจ้าหน้าที่กดเพื่อมอบของรางวัล</button>
+                <!-- พื้นที่แสดง Barcode แลกรางวัล (จะขึ้นอัตโนมัติเมื่อเช็คอินครบ 6 ฐาน) -->
+                <div id="barcodeContainer" style="display: none; text-align: center; margin-top: 15px; padding: 15px; background: #fff3e0; border-radius: 10px; border: 2px dashed #ff7a18;">
+                    <svg id="barcode" style="width: 100%; max-height: 80px;"></svg>
+                    <div style="font-size: 12px; color: #d32f2f; font-weight: 600; margin-top: 8px;">
+                        ⚠️ แสดง Barcode นี้แก่เจ้าหน้าที่ประจำจุดเพื่อรับของรางวัล
+                    </div>
+                </div>
             </div>
         </div>
 
