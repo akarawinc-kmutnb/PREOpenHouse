@@ -41,19 +41,26 @@
 
             <!-- Stamp Card Main Container -->
             <div id="rewardCard" class="profile-card" style="display: none; padding: 20px 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px dashed #f0f0f0; padding-bottom: 10px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px dashed #f0f0f0; padding-bottom: 10px;">
                     <h3 id="rewardTitle" style="margin: 0; color: #333; font-size: 18px;">บัตรสะสมแสตมป์</h3>
-                    <span id="stampCountBadge" style="background: #e0e0e0; color: #555; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px;">0 / 6</span>
+                    <span id="stampCountBadge"
+                        style="background: #e0e0e0; color: #555; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 12px;">0
+                        / 6</span>
                 </div>
 
                 <!-- Grid แสดงตราแสตมป์ 6 ช่อง -->
-                <div id="stampGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;"></div>
+                <div id="stampGrid"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px;"></div>
 
-                <p id="rewardSubTitle" style="color: #666; font-size: 13px; margin-bottom: 15px; text-align: center;">-</p>
+                <p id="rewardSubTitle" style="color: #666; font-size: 13px; margin-bottom: 15px; text-align: center;">-
+                </p>
 
                 <!-- พื้นที่แสดง Barcode แลกรางวัล (จะขึ้นอัตโนมัติเมื่อเช็คอินครบ 6 ฐาน) -->
-                <div id="barcodeContainer" style="display: none; text-align: center; margin-top: 15px; padding: 15px; background: #fff3e0; border-radius: 10px; border: 2px dashed #ff7a18;">
-                    <svg id="barcode" style="width: 100%; max-height: 80px;"></svg>
+                <div id="barcodeContainer"
+                    style="display: none; text-align: center; margin-top: 15px; padding: 15px; background: #fff3e0; border-radius: 10px; border: 2px dashed #ff7a18; overflow: hidden;">
+                    <!-- แก้ไขบรรทัดล่างนี้: เปลี่ยน style เป็น max-width: 100%; height: auto; -->
+                    <svg id="barcode" style="max-width: 100%; height: auto; max-height: 80px;"></svg>
                     <div style="font-size: 12px; color: #d32f2f; font-weight: 600; margin-top: 8px;">
                         ⚠️ แสดง Barcode นี้แก่เจ้าหน้าที่ประจำจุดเพื่อรับของรางวัล
                     </div>
@@ -62,7 +69,8 @@
         </div>
 
         <!-- Footer -->
-        <div style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; color: #888; font-size: 12px;">
+        <div
+            style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; color: #888; font-size: 12px;">
             © 2026 Akarawin Chaorungmatee. All rights reserved.
         </div>
     </div>
