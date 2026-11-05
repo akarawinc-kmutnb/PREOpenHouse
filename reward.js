@@ -44,34 +44,55 @@ function checkRewardStatus(uid) {
         const completedStations = data.completedStations || [];
         const isRedeemed = data.isRedeemed;
 
+        // เรียกฟังก์ชันวาดรูปแสตมป์ (สมมติว่าคุณมีฟังก์ชัน renderStampGrid อยู่แล้ว)
         renderStampGrid(completedStations);
 
         const titleEl = document.getElementById("rewardTitle");
         const subTitleEl = document.getElementById("rewardSubTitle");
         const badgeEl = document.getElementById("stampCountBadge");
-        const btnRedeem = document.getElementById("btnRedeem");
+        
+        // อ้างอิงตัว Barcode แทน btnRedeem
+        const barcodeContainer = document.getElementById("barcodeContainer");
 
-        badgeEl.innerText = `${completedStations.length} / ${allStations.length}`;
+        badgeEl.innerText = `${completedStations.length} / 6`;
 
         if (isRedeemed) {
+            // กรณี: รับรางวัลไปแล้ว
             titleEl.innerText = "🎁 รับของรางวัลแล้ว";
             titleEl.style.color = "#2e7d32";
             badgeEl.style.background = "#e8f5e9";
             badgeEl.style.color = "#2e7d32";
-            subTitleEl.innerText = "ขอบคุณที่เข้าร่วมกิจกรรม Open House 2027 ครับ!";
-            btnRedeem.style.display = "none";
-        } else if (completedStations.length === allStations.length) {
+            subTitleEl.innerText = "ขอบคุณที่เข้าร่วมกิจกรรม Open House ครับ!";
+            
+            if (barcodeContainer) barcodeContainer.style.display = "none";
+
+        } else if (completedStations.length === 6) {
+            // กรณี: แสตมป์ครบ 6 ฐาน (โชว์บาร์โค้ด)
             titleEl.innerText = "🎉 สะสมแสตมป์ครบแล้ว!";
             titleEl.style.color = "#ff7a18";
             badgeEl.style.background = "#fff3e0";
             badgeEl.style.color = "#e65100";
-            subTitleEl.innerText = "ยื่นหน้าจอนี้ให้เจ้าหน้าที่เพื่อกดรับของรางวัล";
-            btnRedeem.style.display = "block";
+            subTitleEl.innerText = "ยื่น Barcode ด้านล่างนี้ให้เจ้าหน้าที่สแกนเพื่อรับของรางวัล";
+            
+            if (barcodeContainer) {
+                barcodeContainer.style.display = "block";
+                // สร้างบาร์โค้ดจาก LINE ID
+                JsBarcode("#barcode", uid, {
+                    format: "CODE128",
+                    lineColor: "#333",
+                    width: 2,
+                    height: 60,
+                    displayValue: false
+                });
+            }
+
         } else {
+            // กรณี: แสตมป์ยังไม่ครบ
             titleEl.innerText = "บัตรสะสมแสตมป์";
             titleEl.style.color = "#333";
             subTitleEl.innerText = "สแกน QR Code เช็คอินให้ครบ 6 ฐานเพื่อรับของรางวัล";
-            btnRedeem.style.display = "none";
+            
+            if (barcodeContainer) barcodeContainer.style.display = "none";
         }
     })
     .catch(err => {
