@@ -6,34 +6,123 @@
     <title>ระบบเจ้าหน้าที่ - สแกนแลกของรางวัล</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- html5-qrcode SDK สำหรับสแกนบาร์โค้ดจากกล้อง -->
+    <!-- html5-qrcode SDK สำหรับสแกน QR Code จากกล้อง -->
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        /* จัด Style เพิ่มเติมเฉพาะหน้า Staff */
+        body {
+            background-color: #f4f7f6;
+        }
+        .staff-header-bg {
+            height: 180px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: -1;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+        }
+        .staff-header-content {
+            text-align: center;
+            padding-top: 25px;
+            margin-bottom: 20px;
+        }
+        .staff-title {
+            color: #ffffff;
+            margin: 0;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 1px 2px 4px rgba(0,0,0,0.2);
+        }
+        .staff-subtitle {
+            color: #d1e1ff;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        .scanner-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            margin: 0 15px;
+        }
+        .scanner-wrapper {
+            border: 3px dashed #2a5298;
+            border-radius: 16px;
+            padding: 5px;
+            background: #f8faff;
+            position: relative;
+        }
+        #reader {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px 15px;
+            background: #e8f0fe;
+            color: #1e3c72;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            border: 1px solid #cce0ff;
+            transition: all 0.3s ease;
+        }
+        .footer-text {
+            position: fixed;
+            bottom: 15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header-bg" style="height: 120px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);"></div>
+    <div class="app-container" style="position: relative; z-index: 1; padding-top: 10px;">
+        <!-- พื้นหลังสีน้ำเงินเข้มสำหรับเจ้าหน้าที่ -->
+        <div class="staff-header-bg"></div>
 
-        <div class="content">
-            <div class="header-content" style="margin-bottom: 15px;">
-                <h2 style="color: #1e3c72; margin: 0;">STAFF SCANNER</h2>
-                <h4 style="color: #666; margin: 5px 0 0 0;">สแกน Barcode ยืนยันการรับรางวัล</h4>
+        <div class="content" style="padding-bottom: 80px;">
+            <!-- ส่วนหัว -->
+            <div class="staff-header-content">
+                <h2 class="staff-title">STAFF SCANNER</h2>
+                <h4 class="staff-subtitle">สแกน QR Code เพื่อยืนยันการจ่ายรางวัล</h4>
             </div>
 
-            <div class="profile-card" style="padding: 15px;">
-                <!-- กล้องสแกน -->
-                <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden;"></div>
+            <!-- การ์ดสำหรับแสดงกล้อง -->
+            <div class="scanner-card">
+                <div class="scanner-wrapper">
+                    <!-- พื้นที่แสดงกล้อง -->
+                    <div id="reader"></div>
+                </div>
                 
-                <div id="scanStatus" style="margin-top: 15px; font-weight: 500; color: #555; text-align: center;">
-                    📷 ส่องกล้องไปที่ Barcode บนจอนักเรียน
+                <!-- สถานะการสแกน -->
+                <div id="scanStatus" class="status-badge">
+                    <span style="font-size: 20px;">📷</span> 
+                    <span>ส่องกล้องไปที่ QR Code บนจอนักเรียน</span>
                 </div>
             </div>
         </div>
 
-        <div style="position: absolute; bottom: 15px; left: 0; right: 0; text-align: center; color: #888; font-size: 12px;">
-            © 2026 Akarawin Chaorungmatee. All rights reserved.
+        <!-- เครดิตด้านล่าง -->
+        <div class="footer-text">
+            © 2026 Akarawin Chaorungmatee.<br>All rights reserved.
         </div>
     </div>
 
+    <!-- Script File -->
     <script src="staff.js"></script>
 </body>
 </html>
