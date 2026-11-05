@@ -2,14 +2,14 @@ const LIFF_ID = "2012346461-eGkNnxR3";
 const REGISTER_LIFF_URL = "https://liff.line.me/2012346461-aXrfKbyZ";
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
-// กำหนดชื่อฐานและชื่อย่อแสดงบนแสตมป์
+// กำหนดโครงสร้างฐานและไฟล์รูปใน src/
 const allStations = [
-    { id: "MachineToolLab", name: "Machine Tool" },
-    { id: "DigitalManufacturing", name: "Digital Mfg." },
-    { id: "AutomationLab", name: "Automation" },
-    { id: "FormingLabs", name: "Forming" },
-    { id: "MaterialTesting", name: "Material Testing" },
-    { id: "Metrology", name: "Metrology" }
+    { id: "MachineToolLab", name: "Machine Tool", img: "src/MachineToolLab.png" },
+    { id: "DigitalManufacturing", name: "Digital Mfg.", img: "src/DigitalManufacturing.png" },
+    { id: "AutomationLab", name: "Automation", img: "src/AutomationLab.png" },
+    { id: "FormingLabs", name: "Forming", img: "src/FormingLabs.png" },
+    { id: "MaterialTesting", name: "Material Testing", img: "src/MaterialTesting.png" },
+    { id: "Metrology", name: "Metrology", img: "src/Metrology.png" }
 ];
 
 let currentUserId = "";
@@ -44,7 +44,6 @@ function checkRewardStatus(uid) {
         const completedStations = data.completedStations || [];
         const isRedeemed = data.isRedeemed;
 
-        // วาดแสตมป์บนการ์ด
         renderStampGrid(completedStations);
 
         const titleEl = document.getElementById("rewardTitle");
@@ -81,7 +80,7 @@ function checkRewardStatus(uid) {
     });
 }
 
-// ฟังก์ชันสร้างการ์ดแสตมป์ (Stamp Grid)
+// ฟังก์ชันวาด Stamp Grid โดยใช้รูปภาพโลโก้ในโฟลเดอร์ src/
 function renderStampGrid(completedStations) {
     const gridEl = document.getElementById("stampGrid");
     let html = "";
@@ -99,42 +98,27 @@ function renderStampGrid(completedStations) {
                 position: relative;
                 box-shadow: ${isDone ? '0 2px 8px rgba(46,125,50,0.15)' : 'none'};
             ">
-                <!-- ตัวเลขลำดับฐาน -->
+                <!-- ลำดับฐาน -->
                 <div style="position: absolute; top: 6px; left: 8px; font-size: 10px; color: #999; font-weight: 600;">#0${index + 1}</div>
                 
-                <!-- ไอคอนแสตมป์ -->
-                <div style="margin: 8px 0 4px 0;">
-                    ${isDone 
-                        ? `<div style="
-                            display: inline-flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            width: 44px; 
-                            height: 44px; 
-                            background: #2e7d32; 
-                            color: white; 
-                            border-radius: 50%; 
-                            font-size: 20px;
-                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                            transform: rotate(-5deg);
-                           ">PASSED</div>` 
-                        : `<div style="
-                            display: inline-flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            width: 44px; 
-                            height: 44px; 
-                            background: #eee; 
-                            color: #aaa; 
-                            border-radius: 50%; 
-                            font-size: 18px;
-                           ">⚪</div>`
-                    }
+                <!-- โลโก้แสตมป์ -->
+                <div style="margin: 6px 0; height: 50px; display: flex; align-items: center; justify-content: center;">
+                    <img src="${st.img}" alt="${st.name}" style="
+                        width: 46px; 
+                        height: 46px; 
+                        object-fit: contain; 
+                        filter: ${isDone ? 'none' : 'grayscale(100%) opacity(30%)'};
+                        transform: ${isDone ? 'scale(1.05)' : 'scale(0.95)'};
+                        transition: all 0.3s ease;
+                    ">
                 </div>
                 
-                <!-- ชื่อฐาน -->
-                <div style="font-size: 12px; font-weight: 500; color: ${isDone ? '#2e7d32' : '#666'};">
+                <!-- ชื่อฐานและสถานะ -->
+                <div style="font-size: 12px; font-weight: 500; color: ${isDone ? '#2e7d32' : '#888'};">
                     ${st.name}
+                </div>
+                <div style="font-size: 10px; font-weight: 600; margin-top: 2px; color: ${isDone ? '#2e7d32' : '#bbb'};">
+                    ${isDone ? '✅ ผ่านแล้ว' : '⚪ ยังไม่เข้า'}
                 </div>
             </div>
         `;
