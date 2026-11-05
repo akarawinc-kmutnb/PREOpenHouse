@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="style.css">
     <!-- LINE LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <!-- JsBarcode SDK สำหรับสร้างบาร์โค้ด -->
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <!-- QRCode.js SDK สำหรับสร้างคิวอาร์โค้ด -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -56,13 +56,15 @@
                 <p id="rewardSubTitle" style="color: #666; font-size: 13px; margin-bottom: 15px; text-align: center;">-
                 </p>
 
-                <!-- พื้นที่แสดง Barcode แลกรางวัล (จะขึ้นอัตโนมัติเมื่อเช็คอินครบ 6 ฐาน) -->
+                <!-- พื้นที่แสดง QR Code แลกรางวัล (จะขึ้นอัตโนมัติเมื่อเช็คอินครบ 6 ฐาน) -->
                 <div id="barcodeContainer"
-                    style="display: none; text-align: center; margin-top: 15px; padding: 15px; background: #fff3e0; border-radius: 10px; border: 2px dashed #ff7a18; overflow: hidden;">
-                    <!-- แก้ไขบรรทัดล่างนี้: เปลี่ยน style เป็น max-width: 100%; height: auto; -->
-                    <svg id="barcode" style="max-width: 100%; height: auto; max-height: 80px;"></svg>
-                    <div style="font-size: 12px; color: #d32f2f; font-weight: 600; margin-top: 8px;">
-                        ⚠️ แสดง Barcode นี้แก่เจ้าหน้าที่ประจำจุดเพื่อรับของรางวัล
+                    style="display: none; text-align: center; margin-top: 15px; padding: 15px; background: #fff3e0; border-radius: 10px; border: 2px dashed #ff7a18;">
+                    
+                    <!-- เปลี่ยนจาก svg เป็น div สำหรับรองรับ QR Code -->
+                    <div id="qrcode" style="display: flex; justify-content: center; margin-top: 10px;"></div>
+                    
+                    <div style="font-size: 12px; color: #d32f2f; font-weight: 600; margin-top: 15px;">
+                        ⚠️ แสดง QR Code นี้แก่เจ้าหน้าที่ประจำจุดเพื่อรับของรางวัล
                     </div>
                 </div>
             </div>

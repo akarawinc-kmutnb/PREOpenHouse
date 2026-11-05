@@ -1,8 +1,7 @@
-const LIFF_ID = "2012346461-eGkNnxR3"; 
+const LIFF_ID = "2012346461-eGkNnxR3";
 const REGISTER_LIFF_URL = "https://liff.line.me/2012346461-aXrfKbyZ";
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz30XwcioTpPSuMYZyUF3X1jtImjG7LabmdFMpkkcfB5HFk-c-cfXb4js_3FIvccGgbhw/exec";
 
-// กำหนดโครงสร้างฐานและไฟล์รูปใน src/
 const allStations = [
     { id: "MachineToolLab", name: "Machine Tool", img: "src/MachineToolLab.png" },
     { id: "DigitalManufacturing", name: "Digital Mfg.", img: "src/DigitalManufacturing.png" },
@@ -14,29 +13,37 @@ const allStations = [
 
 let currentUserId = "";
 
-liff.init({ liffId: LIFF_ID }).then(() => {
-    if (liff.isLoggedIn()) {
-        liff.getProfile().then(profile => {
+// ฟังก์ชันหลักสำหรับเริ่มระบบ
+async function initApp() {
+    try {
+        await liff.init({ liffId: LIFF_ID });
+        if (liff.isLoggedIn()) {
+            const profile = await liff.getProfile();
             currentUserId = profile.userId;
-            checkRewardStatus(currentUserId);
-        });
-    } else {
-        liff.login();
+            await checkRewardStatus(currentUserId);
+        } else {
+            liff.login();
+        }
+    } catch (err) {
+        hideLoading();
+        alert("เกิดข้อผิดพลาดในการโหลด LIFF: " + err.message);
     }
-}).catch(err => {
+}
+
+// ฟังก์ชันซ่อนสถานะกำลังโหลด
+function hideLoading() {
     const loadingEl = document.getElementById("loading");
     if (loadingEl) loadingEl.style.display = "none";
-    alert("เกิดข้อผิดพลาดในการโหลด LIFF: " + err.message);
-});
+}
 
-function checkRewardStatus(uid) {
-    fetch(GAS_URL + "?action=checkReward&userId=" + encodeURIComponent(uid))
-    .then(res => res.json())
-    .then(data => {
-        const loadingEl = document.getElementById("loading");
+// ฟังก์ชันดึงข้อมูลจาก GAS
+async function checkRewardStatus(uid) {
+    try {
+        const response = await fetch(`${GAS_URL}?action=checkReward&userId=${encodeURIComponent(uid)}`);
+        const data = await response.json();
+
+        hideLoading();
         const rewardCardEl = document.getElementById("rewardCard");
-        
-        if (loadingEl) loadingEl.style.display = "none";
         if (rewardCardEl) rewardCardEl.style.display = "block";
 
         if (data.status === "not_registered") {
@@ -49,74 +56,91 @@ function checkRewardStatus(uid) {
         const isRedeemed = data.isRedeemed;
 
         renderStampGrid(completedStations);
+        updateRewardUI(completedStations.length, isRedeemed, uid);
 
-        const titleEl = document.getElementById("rewardTitle");
-        const subTitleEl = document.getElementById("rewardSubTitle");
-        const badgeEl = document.getElementById("stampCountBadge");
-        const barcodeContainer = document.getElementById("barcodeContainer");
-
-        if (badgeEl) badgeEl.innerText = `${completedStations.length} / 6`;
-
-        if (isRedeemed) {
-            // กรณี: รับรางวัลไปแล้ว
-            if (titleEl) {
-                titleEl.innerText = "🎁 รับของรางวัลแล้ว";
-                titleEl.style.color = "#2e7d32";
-            }
-            if (badgeEl) {
-                badgeEl.style.background = "#e8f5e9";
-                badgeEl.style.color = "#2e7d32";
-            }
-            if (subTitleEl) subTitleEl.innerText = "ขอบคุณที่เข้าร่วมกิจกรรม Open House ครับ!";
-            if (barcodeContainer) barcodeContainer.style.display = "none";
-
-        } else if (completedStations.length === 6) {
-            // กรณี: แสตมป์ครบ 6 ฐาน (โชว์บาร์โค้ด)
-            if (titleEl) {
-                titleEl.innerText = "🎉 สะสมแสตมป์ครบแล้ว!";
-                titleEl.style.color = "#ff7a18";
-            }
-            if (badgeEl) {
-                badgeEl.style.background = "#fff3e0";
-                badgeEl.style.color = "#e65100";
-            }
-            if (subTitleEl) subTitleEl.innerText = "ยื่น Barcode ด้านล่างนี้ให้เจ้าหน้าที่สแกนเพื่อรับของรางวัล";
-            
-            if (barcodeContainer) {
-                barcodeContainer.style.display = "block";
-                // เช็คว่าโหลด library JsBarcode มาหรือยัง
-                if (typeof JsBarcode !== "undefined") {
-                    JsBarcode("#barcode", uid, {
-                        format: "CODE128",
-                        lineColor: "#333",
-                        width: 2,
-                        height: 60,
-                        displayValue: false
-                    });
-                }
-            }
-
-        } else {
-            // กรณี: แสตมป์ยังไม่ครบ
-            if (titleEl) {
-                titleEl.innerText = "บัตรสะสมแสตมป์";
-                titleEl.style.color = "#333";
-            }
-            if (subTitleEl) subTitleEl.innerText = "สแกน QR Code เช็คอินให้ครบ 6 ฐานเพื่อรับของรางวัล";
-            if (barcodeContainer) barcodeContainer.style.display = "none";
-        }
-    })
-    .catch(err => {
-        const loadingEl = document.getElementById("loading");
-        if (loadingEl) loadingEl.style.display = "none";
+    } catch (err) {
+        hideLoading();
         alert("ไม่สามารถดึงข้อมูลได้: " + err.message);
+    }
+}
+
+// ฟังก์ชันจัดการการแสดงผลบนหน้าจอ
+function updateRewardUI(completedCount, isRedeemed, uid) {
+    const titleEl = document.getElementById("rewardTitle");
+    const subTitleEl = document.getElementById("rewardSubTitle");
+    const badgeEl = document.getElementById("stampCountBadge");
+    const barcodeContainer = document.getElementById("barcodeContainer");
+
+    if (badgeEl) badgeEl.innerText = `${completedCount} / 6`;
+
+    if (isRedeemed) {
+        // รับรางวัลไปแล้ว
+        if (titleEl) {
+            titleEl.innerText = "🎁 รับของรางวัลแล้ว";
+            titleEl.style.color = "#2e7d32";
+        }
+        if (badgeEl) {
+            badgeEl.style.background = "#e8f5e9";
+            badgeEl.style.color = "#2e7d32";
+        }
+        if (subTitleEl) subTitleEl.innerText = "ขอบคุณที่เข้าร่วมกิจกรรม Open House ครับ!";
+        if (barcodeContainer) barcodeContainer.style.display = "none";
+
+    } else if (completedCount === 6) {
+        // แสตมป์ครบ 6 ฐาน
+        if (titleEl) {
+            titleEl.innerText = "🎉 สะสมแสตมป์ครบแล้ว!";
+            titleEl.style.color = "#ff7a18";
+        }
+        if (badgeEl) {
+            badgeEl.style.background = "#fff3e0";
+            badgeEl.style.color = "#e65100";
+        }
+        if (subTitleEl) subTitleEl.innerText = "ยื่น QR Code ด้านล่างนี้ให้เจ้าหน้าที่สแกนเพื่อรับของรางวัล";
+
+        if (barcodeContainer) {
+            barcodeContainer.style.display = "block";
+            generateQRCode(uid);
+        }
+    } else {
+        // แสตมป์ยังไม่ครบ
+        if (titleEl) {
+            titleEl.innerText = "บัตรสะสมแสตมป์";
+            titleEl.style.color = "#333";
+        }
+        if (subTitleEl) subTitleEl.innerText = "สแกน QR Code เช็คอินให้ครบ 6 ฐานเพื่อรับของรางวัล";
+        if (barcodeContainer) barcodeContainer.style.display = "none";
+    }
+}
+
+// ฟังก์ชันสร้าง QR Code
+function generateQRCode(text) {
+    const qrContainer = document.getElementById("qrcode");
+    if (!qrContainer) return;
+
+    qrContainer.innerHTML = ""; // ล้างคิวอาร์โค้ดเก่าออกก่อน
+
+    // ดักจับ Error กรณีไม่ได้นำเข้า Library QRCode.js ในไฟล์ HTML
+    if (typeof QRCode === "undefined") {
+        qrContainer.innerHTML = "<div style='color:#d32f2f; font-size:14px; margin-top:10px;'>❌ ไม่สามารถสร้าง QR Code ได้ (ไม่พบ QRCode Library)</div>";
+        return;
+    }
+
+    new QRCode(qrContainer, {
+        text: text,
+        width: 150,
+        height: 150,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
     });
 }
 
+// ฟังก์ชันวาดตราประทับ
 function renderStampGrid(completedStations) {
     const gridEl = document.getElementById("stampGrid");
-    if (!gridEl) return; // ดักจับเผื่อไม่มี id="stampGrid"
-    
+    if (!gridEl) return;
+
     let html = "";
     allStations.forEach((st, index) => {
         const isDone = completedStations.includes(st.id);
@@ -151,35 +175,38 @@ function renderStampGrid(completedStations) {
     gridEl.innerHTML = html;
 }
 
-// ฟังก์ชันเดิม (หากในระบบคุณไม่ได้ปุ่ม btnRedeem บนหน้ามือถือแล้ว สามารถลบฟังก์ชันนี้ออกได้เลย แต่คงไว้เพื่อกัน Error)
-function redeemReward() {
-    if (confirm("ยืนยันการมอบของรางวัลแก่ผู้เข้าร่วมงานท่านนี้? (สามารถกดได้เพียงครั้งเดียว)")) {
-        const btn = document.getElementById("btnRedeem");
-        if (btn) {
-            btn.innerText = "กำลังบันทึก...";
-            btn.disabled = true;
-        }
+// ฟังก์ชันเจ้าหน้าที่กดเพื่อมอบของรางวัล
+async function redeemReward() {
+    if (!confirm("ยืนยันการมอบของรางวัลแก่ผู้เข้าร่วมงานท่านนี้? (สามารถกดได้เพียงครั้งเดียว)")) return;
 
-        fetch(GAS_URL + "?action=redeemReward&userId=" + encodeURIComponent(currentUserId))
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                alert("บันทึกการรับของรางวัลเรียบร้อยแล้ว!");
-                checkRewardStatus(currentUserId);
-            } else {
-                alert("เกิดข้อผิดพลาด: " + data.message);
-                if (btn) {
-                    btn.innerText = "เจ้าหน้าที่กดเพื่อมอบของรางวัล";
-                    btn.disabled = false;
-                }
-            }
-        })
-        .catch(err => {
-            alert("บันทึกไม่สำเร็จ: " + err.message);
+    const btn = document.getElementById("btnRedeem");
+    if (btn) {
+        btn.innerText = "กำลังบันทึก...";
+        btn.disabled = true;
+    }
+
+    try {
+        const response = await fetch(`${GAS_URL}?action=redeemReward&userId=${encodeURIComponent(currentUserId)}`);
+        const data = await response.json();
+
+        if (data.status === "success") {
+            alert("บันทึกการรับของรางวัลเรียบร้อยแล้ว!");
+            await checkRewardStatus(currentUserId);
+        } else {
+            alert("เกิดข้อผิดพลาด: " + data.message);
             if (btn) {
                 btn.innerText = "เจ้าหน้าที่กดเพื่อมอบของรางวัล";
                 btn.disabled = false;
             }
-        });
+        }
+    } catch (err) {
+        alert("บันทึกไม่สำเร็จ: " + err.message);
+        if (btn) {
+            btn.innerText = "เจ้าหน้าที่กดเพื่อมอบของรางวัล";
+            btn.disabled = false;
+        }
     }
 }
+
+// เรียกใช้งานเมื่อโหลดไฟล์ Script
+initApp();
