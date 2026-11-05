@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -13,6 +14,7 @@
         body {
             background-color: #f4f7f6;
         }
+
         .staff-header-bg {
             height: 180px;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -25,25 +27,29 @@
             z-index: -1;
             box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
         }
+
         .staff-header-content {
             text-align: center;
             padding-top: 25px;
             margin-bottom: 20px;
         }
+
         .staff-title {
             color: #ffffff;
             margin: 0;
             font-size: 26px;
             font-weight: 600;
             letter-spacing: 1px;
-            text-shadow: 1px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
         }
+
         .staff-subtitle {
             color: #d1e1ff;
             margin: 5px 0 0 0;
             font-size: 14px;
             font-weight: 400;
         }
+
         .scanner-card {
             background: #ffffff;
             border-radius: 20px;
@@ -51,6 +57,7 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
             margin: 0 15px;
         }
+
         .scanner-wrapper {
             border: 3px dashed #2a5298;
             border-radius: 16px;
@@ -58,11 +65,13 @@
             background: #f8faff;
             position: relative;
         }
+
         #reader {
             width: 100%;
             border-radius: 12px;
             overflow: hidden;
         }
+
         .status-badge {
             display: flex;
             align-items: center;
@@ -78,6 +87,7 @@
             border: 1px solid #cce0ff;
             transition: all 0.3s ease;
         }
+
         .footer-text {
             position: fixed;
             bottom: 15px;
@@ -87,8 +97,31 @@
             color: #999;
             font-size: 12px;
         }
+
+        /* Animation สำหรับไอคอนวงกลมหมุนรอผล */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(30, 60, 114, 0.2);
+            border-radius: 50%;
+            border-top-color: #1e3c72;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="app-container" style="position: relative; z-index: 1; padding-top: 10px;">
         <!-- พื้นหลังสีน้ำเงินเข้มสำหรับเจ้าหน้าที่ -->
@@ -107,10 +140,10 @@
                     <!-- พื้นที่แสดงกล้อง -->
                     <div id="reader"></div>
                 </div>
-                
+
                 <!-- สถานะการสแกน -->
                 <div id="scanStatus" class="status-badge">
-                    <span style="font-size: 20px;">📷</span> 
+                    <span style="font-size: 20px;">📷</span>
                     <span>ส่องกล้องไปที่ QR Code บนจอนักเรียน</span>
                 </div>
             </div>
@@ -125,4 +158,5 @@
     <!-- Script File -->
     <script src="staff.js"></script>
 </body>
+
 </html>

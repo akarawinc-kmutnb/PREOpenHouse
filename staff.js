@@ -8,45 +8,63 @@ function onScanSuccess(decodedText, decodedResult) {
     isProcessing = true;
 
     const statusEl = document.getElementById("scanStatus");
-    statusEl.innerHTML = "⏳ กำลังตรวจสอบและบันทึกข้อมูล...";
-    statusEl.style.color = "#ff9800";
+    
+    // แสดงวงกลมหมุนรอผลขณะส่งข้อมูลไปประมวลผล
+    statusEl.innerHTML = `<span class="spinner"></span> <span>กำลังตรวจสอบข้อมูล...</span>`;
+    statusEl.style.background = "#fff3e0";
+    statusEl.style.color = "#e65100";
+    statusEl.style.borderColor = "#ffe0b2";
 
-    // ส่ง LINE ID ที่ได้จาก Barcode ไปตัดสิทธิ์แลกรางวัลใน Google Sheet
+    // ส่ง LINE ID ไปบันทึกการรับของรางวัลใน Google Sheet
     fetch(GAS_URL + "?action=redeemReward&userId=" + encodeURIComponent(decodedText))
     .then(res => res.json())
     .then(data => {
         if (data.status === "success") {
-            statusEl.innerHTML = "✅ <b>สำเร็จ!</b> มอบของรางวัลเรียบร้อยแล้ว";
+            statusEl.innerHTML = `✅ <b>รับรางวัลสำเร็จ!</b> มอบของรางวัลเรียบร้อย`;
+            statusEl.style.background = "#e8f5e9";
             statusEl.style.color = "#2e7d32";
-            alert("✅ บันทึกสำเร็จ! มอบของรางวัลเรียบร้อยแล้ว");
+            statusEl.style.borderColor = "#a5d6a7";
         } else {
-            statusEl.innerHTML = "❌ " + (data.message || "เกิดข้อผิดพลาด");
+            statusEl.innerHTML = `❌ ${data.message || "เกิดข้อผิดพลาด"}`;
+            statusEl.style.background = "#ffebee";
             statusEl.style.color = "#c62828";
-            alert("❌ ไม่สามารถแลกได้: " + (data.message || "ข้อมูลไม่ถูกต้อง"));
+            statusEl.style.borderColor = "#ef9a9a";
         }
         
         // หน่วงเวลา 2.5 วินาที ก่อนเปิดรับการสแกนคนถัดไป
         setTimeout(() => {
-            isProcessing = false;
-            statusEl.innerHTML = "📷 ส่องกล้องไปที่ Barcode บนจอนักเรียน";
-            statusEl.style.color = "#555";
+            resetScannerStatus();
         }, 2500);
     })
     .catch(err => {
-        statusEl.innerHTML = "❌ เชื่อมต่อล้มเหลว";
+        statusEl.innerHTML = `❌ เชื่อมต่อล้มเหลว: ${err.message}`;
+        statusEl.style.background = "#ffebee";
         statusEl.style.color = "#c62828";
-        alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
-        isProcessing = false;
+        statusEl.style.borderColor = "#ef9a9a";
+        
+        setTimeout(() => {
+            resetScannerStatus();
+        }, 2500);
     });
 }
 
-// เริ่มต้นเปิดใช้งานกล้อง
+// ฟังก์ชันคืนค่าสถานะพร้อมสแกนคนถัดไป
+function resetScannerStatus() {
+    isProcessing = false;
+    const statusEl = document.getElementById("scanStatus");
+    statusEl.innerHTML = `<span style="font-size: 20px;">📷</span> <span>ส่องกล้องไปที่ QR Code บนจอนักเรียน</span>`;
+    statusEl.style.background = "#e8f0fe";
+    statusEl.style.color = "#1e3c72";
+    statusEl.style.borderColor = "#cce0ff";
+}
+
+// เริ่มต้นกล้อง
 window.onload = function() {
     html5QrcodeScanner = new Html5QrcodeScanner(
         "reader", 
         { 
             fps: 10, 
-            qrbox: { width: 250, height: 150 },
+            qrbox: { width: 220, height: 220 },
             aspectRatio: 1.0
         },
         /* verbose= */ false
